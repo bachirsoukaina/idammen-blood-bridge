@@ -22,11 +22,11 @@ export function SiteHeader() {
 
   return (
     <header className="site-header">
-      <div className="container-id" style={{ display: 'flex', alignItems: 'center', height: '100%', gap: 24 }}>
+      <div className="container-id header-inner">
         <Link to="/" aria-label="Idammen">
           <Brand />
         </Link>
-        <nav aria-label="Principal" style={{ display: 'flex', gap: 22, flex: 1 }}>
+        <nav aria-label="Principal" className="desktop-nav">
           <Link to="/" className="nav-link" activeProps={{ 'data-status': 'active' }}>
             {t('home')}
           </Link>
@@ -40,7 +40,7 @@ export function SiteHeader() {
             {t('compatibility')}
           </Link>
         </nav>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div className="header-actions">
           <LanguageSelect />
           {session ? (
             <>
@@ -61,16 +61,16 @@ export function SiteHeader() {
               </Link>
             </>
           )}
-          <button
-            type="button"
-            aria-label={t('menu')}
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-            style={{ background: 'none', border: 0, color: 'var(--primary)', cursor: 'pointer' }}
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
         </div>
+        <button
+          type="button"
+          aria-label={t('menu')}
+          aria-expanded={open}
+          className="menu-toggle"
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
       {open && (
         <nav className="mobile-nav" aria-label={t('menu')}>
