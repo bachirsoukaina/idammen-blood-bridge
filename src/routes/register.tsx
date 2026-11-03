@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -61,7 +61,8 @@ function RegisterPage() {
     try {
       const { token } = await authApi.register(values);
       saveToken(token);
-      void navigate({ to: roleHome('DONNEUR'), replace: true });
+      // Cast: the donor routes are not in the generated route tree yet.
+      void navigate({ to: roleHome('DONNEUR') as '/', replace: true });
     } catch (e) {
       toast.error(errorMessage(e, t));
     }

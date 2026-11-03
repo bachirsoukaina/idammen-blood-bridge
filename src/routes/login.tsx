@@ -38,7 +38,8 @@ function LoginPage() {
   const enter = (token: string) => {
     saveToken(token);
     const role = decodeToken(token)?.role ?? 'DONNEUR';
-    void navigate({ to: roleHome(role), replace: true });
+    // Cast: the donor/center routes are not in the generated route tree yet.
+    void navigate({ to: roleHome(role) as '/', replace: true });
   };
 
   const onSubmit = form.handleSubmit(async (values) => {
