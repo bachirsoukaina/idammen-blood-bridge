@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { authApi } from '@/api/authApi';
-import { profileSchema, registerSchema } from '@/api/validation';
+import { registerSchema } from '@/api/validation';
 import { roleHome, saveToken } from '@/api/session';
 import { cities, bloodGroups } from '@/api/models';
 import { errorMessage } from '@/lib/errors';
@@ -42,7 +42,9 @@ function RegisterPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const form = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
+    // Cast: le formulaire manipule des strings (inputs HTML), le schéma Zod
+    // les convertit/valide (nombre, enum). Les deux types diffèrent volontairement.
+    resolver: zodResolver(registerSchema) as unknown as Resolver<RegisterValues>,
     defaultValues: {
       nom: '',
       email: '',
