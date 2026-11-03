@@ -44,7 +44,8 @@ export function SiteHeader() {
           <LanguageSelect />
           {session ? (
             <>
-              <Link to={roleHome(session.role)} className="nav-link" style={{ fontWeight: 700 }}>
+              {/* Cast: the donor/center routes are not in the generated route tree yet. */}
+              <Link to={roleHome(session.role) as '/'} className="nav-link" style={{ fontWeight: 700 }}>
                 {session.role === 'CENTRE' ? t('centerSpace') : t('donorSpace')}
               </Link>
               <button type="button" className="nav-link" onClick={logout}>
@@ -82,7 +83,7 @@ export function SiteHeader() {
           </Link>
           {session ? (
             <>
-              <Link to={roleHome(session.role)} onClick={() => setOpen(false)}>
+              <Link to={roleHome(session.role) as '/'} onClick={() => setOpen(false)}>
                 {session.role === 'CENTRE' ? t('centerSpace') : t('donorSpace')}
               </Link>
               <button type="button" onClick={logout}>
