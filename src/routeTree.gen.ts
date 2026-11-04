@@ -13,6 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
+import { Route as CenterMapRouteImport } from './routes/center.map'
+import { Route as CenterRequestsRouteImport } from './routes/center.requests'
+import { Route as CenterResponsesRouteImport } from './routes/center.responses'
+import { Route as CenterStatsRouteImport } from './routes/center.stats'
 import { Route as CenterStockRouteImport } from './routes/center.stock'
 import { Route as DonorAlertsRouteImport } from './routes/donor.alerts'
 import { Route as DonorLoyaltyRouteImport } from './routes/donor.loyalty'
@@ -36,6 +40,26 @@ const RegisterRoute = RegisterRouteImport.update({
 const CenterDashboardRoute = CenterDashboardRouteImport.update({
   id: '/center/dashboard',
   path: '/center/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterMapRoute = CenterMapRouteImport.update({
+  id: '/center/map',
+  path: '/center/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterRequestsRoute = CenterRequestsRouteImport.update({
+  id: '/center/requests',
+  path: '/center/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterResponsesRoute = CenterResponsesRouteImport.update({
+  id: '/center/responses',
+  path: '/center/responses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterStatsRoute = CenterStatsRouteImport.update({
+  id: '/center/stats',
+  path: '/center/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CenterStockRoute = CenterStockRouteImport.update({
@@ -64,6 +88,10 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/map': typeof CenterMapRoute
+  '/center/requests': typeof CenterRequestsRoute
+  '/center/responses': typeof CenterResponsesRoute
+  '/center/stats': typeof CenterStatsRoute
   '/center/stock': typeof CenterStockRoute
   '/donor/alerts': typeof DonorAlertsRoute
   '/donor/loyalty': typeof DonorLoyaltyRoute
@@ -74,6 +102,10 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/map': typeof CenterMapRoute
+  '/center/requests': typeof CenterRequestsRoute
+  '/center/responses': typeof CenterResponsesRoute
+  '/center/stats': typeof CenterStatsRoute
   '/center/stock': typeof CenterStockRoute
   '/donor/alerts': typeof DonorAlertsRoute
   '/donor/loyalty': typeof DonorLoyaltyRoute
@@ -85,6 +117,10 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/center/dashboard': typeof CenterDashboardRoute
+  '/center/map': typeof CenterMapRoute
+  '/center/requests': typeof CenterRequestsRoute
+  '/center/responses': typeof CenterResponsesRoute
+  '/center/stats': typeof CenterStatsRoute
   '/center/stock': typeof CenterStockRoute
   '/donor/alerts': typeof DonorAlertsRoute
   '/donor/loyalty': typeof DonorLoyaltyRoute
@@ -97,6 +133,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/center/dashboard'
+    | '/center/map'
+    | '/center/requests'
+    | '/center/responses'
+    | '/center/stats'
     | '/center/stock'
     | '/donor/alerts'
     | '/donor/loyalty'
@@ -107,6 +147,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/center/dashboard'
+    | '/center/map'
+    | '/center/requests'
+    | '/center/responses'
+    | '/center/stats'
     | '/center/stock'
     | '/donor/alerts'
     | '/donor/loyalty'
@@ -117,6 +161,10 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/center/dashboard'
+    | '/center/map'
+    | '/center/requests'
+    | '/center/responses'
+    | '/center/stats'
     | '/center/stock'
     | '/donor/alerts'
     | '/donor/loyalty'
@@ -128,6 +176,10 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   CenterDashboardRoute: typeof CenterDashboardRoute
+  CenterMapRoute: typeof CenterMapRoute
+  CenterRequestsRoute: typeof CenterRequestsRoute
+  CenterResponsesRoute: typeof CenterResponsesRoute
+  CenterStatsRoute: typeof CenterStatsRoute
   CenterStockRoute: typeof CenterStockRoute
   DonorAlertsRoute: typeof DonorAlertsRoute
   DonorLoyaltyRoute: typeof DonorLoyaltyRoute
@@ -162,6 +214,34 @@ declare module '@tanstack/react-router' {
       path: '/center/dashboard'
       fullPath: '/center/dashboard'
       preLoaderRoute: typeof CenterDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/map': {
+      id: '/center/map'
+      path: '/center/map'
+      fullPath: '/center/map'
+      preLoaderRoute: typeof CenterMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/requests': {
+      id: '/center/requests'
+      path: '/center/requests'
+      fullPath: '/center/requests'
+      preLoaderRoute: typeof CenterRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/responses': {
+      id: '/center/responses'
+      path: '/center/responses'
+      fullPath: '/center/responses'
+      preLoaderRoute: typeof CenterResponsesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/stats': {
+      id: '/center/stats'
+      path: '/center/stats'
+      fullPath: '/center/stats'
+      preLoaderRoute: typeof CenterStatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/center/stock': {
@@ -200,6 +280,10 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   CenterDashboardRoute: CenterDashboardRoute,
+  CenterMapRoute: CenterMapRoute,
+  CenterRequestsRoute: CenterRequestsRoute,
+  CenterResponsesRoute: CenterResponsesRoute,
+  CenterStatsRoute: CenterStatsRoute,
   CenterStockRoute: CenterStockRoute,
   DonorAlertsRoute: DonorAlertsRoute,
   DonorLoyaltyRoute: DonorLoyaltyRoute,
