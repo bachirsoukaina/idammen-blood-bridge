@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as DonorAlertsRouteImport } from './routes/donor.alerts'
+import { Route as DonorProfileRouteImport } from './routes/donor.profile'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +30,59 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DonorAlertsRoute = DonorAlertsRouteImport.update({
+  id: '/donor/alerts',
+  path: '/donor/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonorProfileRoute = DonorProfileRouteImport.update({
+  id: '/donor/profile',
+  path: '/donor/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/donor/alerts': typeof DonorAlertsRoute
+  '/donor/profile': typeof DonorProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/donor/alerts': typeof DonorAlertsRoute
+  '/donor/profile': typeof DonorProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/donor/alerts': typeof DonorAlertsRoute
+  '/donor/profile': typeof DonorProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths: '/' | '/login' | '/register' | '/donor/alerts' | '/donor/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
-  id: '__root__' | '/' | '/login' | '/register'
+  to: '/' | '/login' | '/register' | '/donor/alerts' | '/donor/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/register'
+    | '/donor/alerts'
+    | '/donor/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  DonorAlertsRoute: typeof DonorAlertsRoute
+  DonorProfileRoute: typeof DonorProfileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +108,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/donor/alerts': {
+      id: '/donor/alerts'
+      path: '/donor/alerts'
+      fullPath: '/donor/alerts'
+      preLoaderRoute: typeof DonorAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/donor/profile': {
+      id: '/donor/profile'
+      path: '/donor/profile'
+      fullPath: '/donor/profile'
+      preLoaderRoute: typeof DonorProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +129,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  DonorAlertsRoute: DonorAlertsRoute,
+  DonorProfileRoute: DonorProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
