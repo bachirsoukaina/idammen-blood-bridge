@@ -12,7 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
+import { Route as CenterStockRouteImport } from './routes/center.stock'
 import { Route as DonorAlertsRouteImport } from './routes/donor.alerts'
+import { Route as DonorLoyaltyRouteImport } from './routes/donor.loyalty'
 import { Route as DonorProfileRouteImport } from './routes/donor.profile'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,9 +33,24 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CenterDashboardRoute = CenterDashboardRouteImport.update({
+  id: '/center/dashboard',
+  path: '/center/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CenterStockRoute = CenterStockRouteImport.update({
+  id: '/center/stock',
+  path: '/center/stock',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DonorAlertsRoute = DonorAlertsRouteImport.update({
   id: '/donor/alerts',
   path: '/donor/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonorLoyaltyRoute = DonorLoyaltyRouteImport.update({
+  id: '/donor/loyalty',
+  path: '/donor/loyalty',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DonorProfileRoute = DonorProfileRouteImport.update({
@@ -45,14 +63,20 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/center/dashboard': typeof CenterDashboardRoute
+  '/center/stock': typeof CenterStockRoute
   '/donor/alerts': typeof DonorAlertsRoute
+  '/donor/loyalty': typeof DonorLoyaltyRoute
   '/donor/profile': typeof DonorProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/center/dashboard': typeof CenterDashboardRoute
+  '/center/stock': typeof CenterStockRoute
   '/donor/alerts': typeof DonorAlertsRoute
+  '/donor/loyalty': typeof DonorLoyaltyRoute
   '/donor/profile': typeof DonorProfileRoute
 }
 export interface FileRoutesById {
@@ -60,20 +84,42 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/center/dashboard': typeof CenterDashboardRoute
+  '/center/stock': typeof CenterStockRoute
   '/donor/alerts': typeof DonorAlertsRoute
+  '/donor/loyalty': typeof DonorLoyaltyRoute
   '/donor/profile': typeof DonorProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/donor/alerts' | '/donor/profile'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/center/dashboard'
+    | '/center/stock'
+    | '/donor/alerts'
+    | '/donor/loyalty'
+    | '/donor/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/donor/alerts' | '/donor/profile'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/center/dashboard'
+    | '/center/stock'
+    | '/donor/alerts'
+    | '/donor/loyalty'
+    | '/donor/profile'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/register'
+    | '/center/dashboard'
+    | '/center/stock'
     | '/donor/alerts'
+    | '/donor/loyalty'
     | '/donor/profile'
   fileRoutesById: FileRoutesById
 }
@@ -81,7 +127,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  CenterDashboardRoute: typeof CenterDashboardRoute
+  CenterStockRoute: typeof CenterStockRoute
   DonorAlertsRoute: typeof DonorAlertsRoute
+  DonorLoyaltyRoute: typeof DonorLoyaltyRoute
   DonorProfileRoute: typeof DonorProfileRoute
 }
 
@@ -108,11 +157,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/center/dashboard': {
+      id: '/center/dashboard'
+      path: '/center/dashboard'
+      fullPath: '/center/dashboard'
+      preLoaderRoute: typeof CenterDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/center/stock': {
+      id: '/center/stock'
+      path: '/center/stock'
+      fullPath: '/center/stock'
+      preLoaderRoute: typeof CenterStockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/donor/alerts': {
       id: '/donor/alerts'
       path: '/donor/alerts'
       fullPath: '/donor/alerts'
       preLoaderRoute: typeof DonorAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/donor/loyalty': {
+      id: '/donor/loyalty'
+      path: '/donor/loyalty'
+      fullPath: '/donor/loyalty'
+      preLoaderRoute: typeof DonorLoyaltyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/donor/profile': {
@@ -129,7 +199,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  CenterDashboardRoute: CenterDashboardRoute,
+  CenterStockRoute: CenterStockRoute,
   DonorAlertsRoute: DonorAlertsRoute,
+  DonorLoyaltyRoute: DonorLoyaltyRoute,
   DonorProfileRoute: DonorProfileRoute,
 }
 export const routeTree = rootRouteImport

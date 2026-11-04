@@ -7,6 +7,7 @@ import { requestApi } from '@/api/requestApi';
 import type { DemandeDon, StockSang } from '@/api/models';
 import { errorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/format';
+import { lowStockRows } from '@/lib/stock';
 import { RoleGuard } from '@/components/role-guard';
 import { SiteHeader } from '@/components/site-header';
 
@@ -58,9 +59,6 @@ function isExpired(r: DemandeDon) {
 }
 
 export { CenterNav };
-export function lowStockRows(stock: StockSang[]): StockSang[] {
-  return stock.filter((s) => s.quantitePoches <= s.seuilAlerte);
-}
 
 function CenterDashboardPage() {
   const { t } = useTranslation();
@@ -133,7 +131,9 @@ function CenterDashboardPage() {
               </section>
               <section style={card}>
                 <div style={{ fontSize: 32, fontWeight: 900 }}>{stock.reduce((n, s) => n + s.quantitePoches, 0)}</div>
-                <div style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>{t('bags', { count: 0 }).replace(/^0\s*/, '')}</div>
+                <div style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>
+                  {t('bags', { count: stock.reduce((n, s) => n + s.quantitePoches, 0) })}
+                </div>
                 <Link to="/center/stats" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 14, display: 'inline-block', marginTop: 8 }}>
                   {t('stats')} →
                 </Link>
