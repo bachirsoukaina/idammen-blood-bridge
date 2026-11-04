@@ -9,7 +9,7 @@ import { errorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/format';
 import { RoleGuard } from '@/components/role-guard';
 import { SiteHeader } from '@/components/site-header';
-import { CenterNav, lowStockRows } from './center.dashboard';
+import { CenterNav } from './center.dashboard';
 
 export const Route = createFileRoute('/center/stock')({
   head: () => ({ meta: [{ title: 'Stock sanguin — Idammen' }] }),
@@ -136,4 +136,3 @@ function CenterStockPage() {
     </>
   );
 }
-export { lowStockRows as _lowStockRows };
