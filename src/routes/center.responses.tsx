@@ -13,7 +13,7 @@ import { CenterNav } from './center.dashboard';
 
 export const Route = createFileRoute('/center/responses')({
   validateSearch: (search: Record<string, unknown>) => ({
-    request: Number(search.request) || 0,
+    request: Number(search['request']) || 0,
   }),
   head: () => ({ meta: [{ title: 'Réponses des donneurs — Idammen' }] }),
   component: () => (
