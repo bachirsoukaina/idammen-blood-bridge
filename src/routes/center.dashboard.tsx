@@ -35,7 +35,7 @@ const urgenceColor: Record<string, string> = {
 
 function CenterNav() {
   const { t } = useTranslation();
-  const links = [
+  const links: [string, string][] = [
     ['/center/dashboard', t('dashboard')],
     ['/center/stock', t('stock')],
     ['/center/requests', t('requests')],
