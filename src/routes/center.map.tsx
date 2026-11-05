@@ -1,17 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
-import { centerApi } from '@/api/centerApi';
-import type { Donneur } from '@/api/models';
-import { errorMessage } from '@/lib/errors';
-import { RoleGuard } from '@/components/role-guard';
-import { SiteHeader } from '@/components/site-header';
-import { MapView } from '@/components/map/map-view';
-import { CenterNav } from './center.dashboard';
+import { centerApi } from "@/api/centerApi";
+import type { Donneur } from "@/api/models";
+import { errorMessage } from "@/lib/errors";
+import { RoleGuard } from "@/components/role-guard";
+import { AppShell, PageError, PageLoading } from "@/components/app-shell";
+import { MapView } from "@/components/map/map-view";
 
-export const Route = createFileRoute('/center/map')({
-  head: () => ({ meta: [{ title: 'Carte des donneurs — Idammen' }] }),
+export const Route = createFileRoute("/center/map")({
+  head: () => ({ meta: [{ title: "Carte des donneurs — Idammen" }] }),
   component: () => (
     <RoleGuard role="CENTRE">
       <CenterMapPage />
@@ -19,30 +18,23 @@ export const Route = createFileRoute('/center/map')({
   ),
 });
 
-const card: React.CSSProperties = {
-  background: '#fff',
-  border: '1px solid var(--border, #e5e0df)',
-  borderRadius: 10,
-  padding: 20,
-};
-
 function CenterMapPage() {
   const { t } = useTranslation();
-  const [state, setState] = useState<'loading' | 'error' | 'ready'>('loading');
-  const [error, setError] = useState('');
+  const [state, setState] = useState<"loading" | "error" | "ready">("loading");
+  const [error, setError] = useState("");
   const [center, setCenter] = useState<Awaited<ReturnType<typeof centerApi.me>> | null>(null);
   const [donors, setDonors] = useState<Donneur[]>([]);
 
   const load = useCallback(async () => {
-    setState('loading');
+    setState("loading");
     try {
       const [c, list] = await Promise.all([centerApi.me(), centerApi.nearby()]);
       setCenter(c);
       setDonors(list);
-      setState('ready');
+      setState("ready");
     } catch (e) {
       setError(errorMessage(e, t));
-      setState('error');
+      setState("error");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -52,56 +44,80 @@ function CenterMapPage() {
   }, [load]);
 
   return (
-    <>
-      <SiteHeader />
-      <main style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 16px', display: 'grid', gap: 20 }}>
-        <div style={{ display: 'grid', gap: 10 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>{t('map')}</h1>
-          <CenterNav />
-        </div>
+    <AppShell space="center" title={t("map")} intro={t("mapIntro")}>
+      {state === "loading" && <PageLoading />}
 
-        {state === 'loading' && <p role="status">{t('loading')}</p>}
+      {state === "error" && <PageError message={error} onRetry={() => void load()} />}
 
-        {state === 'error' && (
-          <div style={{ ...card, borderColor: 'var(--primary)' }} role="alert">
-            <p>{error}</p>
-            <button type="button" onClick={() => void load()} style={{ marginTop: 10, fontWeight: 700, cursor: 'pointer' }}>
-              {t('retry')}
-            </button>
-          </div>
-        )}
-
-        {state === 'ready' && center && (
-          <>
-            <p style={{ color: 'var(--muted-foreground)', margin: 0 }}>{t('mapIntro')}</p>
-            <MapView
-              large
-              center={[center.latitude, center.longitude]}
-              zoom={11}
-              markers={[
-                { latitude: center.latitude, longitude: center.longitude, label: center.nom, detail: center.adresse, kind: 'center' },
-                ...donors.map((d) => ({
-                  latitude: d.latitude,
-                  longitude: d.longitude,
-                  label: d.nom,
-                  detail: `${d.groupeSanguin} · ${d.statutEligibilite === 'NON_ELIGIBLE' ? t('notEligible') : t('eligible')}`,
-                  kind: d.statutEligibilite === 'NON_ELIGIBLE' ? ('ineligible' as const) : ('eligible' as const),
-                })),
-              ]}
-            />
-            <section style={{ ...card, display: 'grid', gap: 8 }}>
-              {donors.map((d) => (
-                <div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap', fontSize: 14, borderBottom: '1px solid var(--border, #eee)', paddingBottom: 6 }}>
-                  <strong>{d.nom}</strong>
-                  <span>
-                    {d.groupeSanguin} · {d.telephone}
-                  </span>
-                </div>
-              ))}
-            </section>
-          </>
-        )}
-      </main>
-    </>
+      {state === "ready" && center && (
+        <>
+          <MapView
+            large
+            center={[center.latitude, center.longitude]}
+            zoom={11}
+            markers={[
+              {
+                latitude: center.latitude,
+                longitude: center.longitude,
+                label: center.nom,
+                detail: center.adresse,
+                kind: "center",
+              },
+              ...donors.map((d) => ({
+                latitude: d.latitude,
+                longitude: d.longitude,
+                label: d.nom,
+                detail: `${d.groupeSanguin} · ${d.statutEligibilite === "NON_ELIGIBLE" ? t("notEligible") : t("eligible")}`,
+                kind:
+                  d.statutEligibilite === "NON_ELIGIBLE"
+                    ? ("ineligible" as const)
+                    : ("eligible" as const),
+              })),
+            ]}
+          />
+          <section className="surface" style={{ overflowX: "auto" }}>
+            <div className="surface-head">
+              <h2 className="surface-title">{t("nearbyDonors")}</h2>
+              <span className="status good">
+                {donors.filter((d) => d.statutEligibilite !== "NON_ELIGIBLE").length}{" "}
+                {t("eligible")}
+              </span>
+            </div>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>{t("fullName")}</th>
+                  <th>{t("bloodGroup")}</th>
+                  <th>{t("phone")}</th>
+                  <th>{t("status")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {donors.map((d) => (
+                  <tr key={d.id}>
+                    <td>
+                      <strong>{d.nom}</strong>
+                    </td>
+                    <td>
+                      <span className="blood-badge">{d.groupeSanguin}</span>
+                    </td>
+                    <td dir="ltr" style={{ textAlign: "start" }}>
+                      {d.telephone}
+                    </td>
+                    <td>
+                      {d.statutEligibilite === "NON_ELIGIBLE" ? (
+                        <span className="status muted">{t("notEligible")}</span>
+                      ) : (
+                        <span className="status good">{t("eligible")}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        </>
+      )}
+    </AppShell>
   );
 }

@@ -1,18 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link, createFileRoute } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
+import { useCallback, useEffect, useState } from "react";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { AlertTriangle, ArrowRight, ClipboardCheck, Droplets, Plus, Siren } from "lucide-react";
 
-import { centerApi } from '@/api/centerApi';
-import { requestApi } from '@/api/requestApi';
-import type { DemandeDon, StockSang } from '@/api/models';
-import { errorMessage } from '@/lib/errors';
-import { formatDateTime } from '@/lib/format';
-import { lowStockRows } from '@/lib/stock';
-import { RoleGuard } from '@/components/role-guard';
-import { SiteHeader } from '@/components/site-header';
+import { centerApi } from "@/api/centerApi";
+import { requestApi } from "@/api/requestApi";
+import type { Centre, DemandeDon, DonorResponse, StockSang } from "@/api/models";
+import { errorMessage } from "@/lib/errors";
+import { formatDateTime } from "@/lib/format";
+import { gaugeMax, isRequestExpired, levelStatusClass, stockLevel } from "@/lib/stock";
+import { RoleGuard } from "@/components/role-guard";
+import { AppShell, EmptyState, PageError, PageLoading } from "@/components/app-shell";
 
-export const Route = createFileRoute('/center/dashboard')({
-  head: () => ({ meta: [{ title: 'Tableau de bord — Idammen' }] }),
+export const Route = createFileRoute("/center/dashboard")({
+  head: () => ({ meta: [{ title: "Tableau de bord — Idammen" }] }),
   component: () => (
     <RoleGuard role="CENTRE">
       <CenterDashboardPage />
@@ -20,65 +21,48 @@ export const Route = createFileRoute('/center/dashboard')({
   ),
 });
 
-const card: React.CSSProperties = {
-  background: '#fff',
-  border: '1px solid var(--border, #e5e0df)',
-  borderRadius: 10,
-  padding: 20,
+export const urgenceStatusClass: Record<string, string> = {
+  CRITIQUE: "",
+  URGENTE: "warn",
+  NORMALE: "info",
 };
 
-const urgenceColor: Record<string, string> = {
-  CRITIQUE: '#c0392b',
-  URGENTE: '#d9a441',
-  NORMALE: '#1f3a5f',
-};
+const levelKey = { critical: "levelCritical", low: "levelLow", ok: "levelOk" } as const;
 
-function CenterNav() {
-  const { t } = useTranslation();
-  const links: [string, string][] = [
-    ['/center/dashboard', t('dashboard')],
-    ['/center/stock', t('stock')],
-    ['/center/requests', t('requests')],
-    ['/center/responses', t('responses')],
-    ['/center/map', t('map')],
-    ['/center/stats', t('stats')],
-  ];
-  return (
-    <nav aria-label={t('centerSpace')} style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontSize: 14, fontWeight: 700 }}>
-      {links.map(([to, label]) => (
-        <Link key={to} to={to} activeProps={{ style: { color: 'var(--primary)', textDecoration: 'underline' } }} style={{ color: 'var(--muted-foreground)' }}>
-          {label}
-        </Link>
-      ))}
-    </nav>
-  );
-}
-
-function isExpired(r: DemandeDon) {
-  return r.statut === 'EXPIREE' || new Date(r.dateExpiration).getTime() < Date.now();
-}
-
-export { CenterNav };
+type Pending = DonorResponse & { demande: DemandeDon };
 
 function CenterDashboardPage() {
   const { t } = useTranslation();
-  const [state, setState] = useState<'loading' | 'error' | 'ready'>('loading');
-  const [error, setError] = useState('');
-  const [center, setCenter] = useState<Awaited<ReturnType<typeof centerApi.me>> | null>(null);
+  const [state, setState] = useState<"loading" | "error" | "ready">("loading");
+  const [error, setError] = useState("");
+  const [center, setCenter] = useState<Centre | null>(null);
   const [stock, setStock] = useState<StockSang[]>([]);
   const [requests, setRequests] = useState<DemandeDon[]>([]);
+  const [pending, setPending] = useState<Pending[]>([]);
 
   const load = useCallback(async () => {
-    setState('loading');
+    setState("loading");
     try {
       const [c, s, r] = await Promise.all([centerApi.me(), centerApi.stock(), requestApi.list()]);
+      const active = r.filter((d) => !isRequestExpired(d));
+      // Donors who confirmed and still have to be validated at the center.
+      const responses = await Promise.all(
+        active.map((d) =>
+          requestApi.responses(d.id).then((rows) => rows.map((row) => ({ ...row, demande: d }))),
+        ),
+      );
       setCenter(c);
       setStock(s);
       setRequests(r);
-      setState('ready');
+      setPending(
+        responses
+          .flat()
+          .filter((row) => row.reponse === "CONFIRME" && row.don.statut === "PLANIFIE"),
+      );
+      setState("ready");
     } catch (e) {
       setError(errorMessage(e, t));
-      setState('error');
+      setState("error");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -87,93 +71,211 @@ function CenterDashboardPage() {
     void load();
   }, [load]);
 
-  const low = lowStockRows(stock);
-  const active = requests.filter((r) => !isExpired(r));
+  const active = requests.filter((r) => !isRequestExpired(r));
+  const below = stock.filter((s) => stockLevel(s) !== "ok");
+  const total = stock.reduce((n, s) => n + s.quantitePoches, 0);
+  const max = gaugeMax(stock);
 
   return (
-    <>
-      <SiteHeader />
-      <main style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 16px', display: 'grid', gap: 20 }}>
-        <div style={{ display: 'grid', gap: 10 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0 }}>{center?.nom ?? t('centerSpace')}</h1>
-          <CenterNav />
-        </div>
+    <AppShell
+      space="center"
+      title={center?.nom ?? t("dashboard")}
+      intro={center ? `${center.adresse} · ${t("centerIntro")}` : t("centerIntro")}
+      actions={
+        <Link to="/center/requests" className="btn btn-primary">
+          <Plus size={16} aria-hidden /> {t("newRequest")}
+        </Link>
+      }
+    >
+      {state === "loading" && <PageLoading />}
+      {state === "error" && <PageError message={error} onRetry={() => void load()} />}
 
-        {state === 'loading' && <p role="status">{t('loading')}</p>}
-
-        {state === 'error' && (
-          <div style={{ ...card, borderColor: 'var(--primary)' }} role="alert">
-            <p>{error}</p>
-            <button type="button" onClick={() => void load()} style={{ marginTop: 10, fontWeight: 700, cursor: 'pointer' }}>
-              {t('retry')}
-            </button>
+      {state === "ready" && (
+        <>
+          <div className="kpi-grid">
+            <Kpi icon={<Droplets size={20} />} tone="info" value={total} label={t("totalBags")} />
+            <Kpi
+              icon={<AlertTriangle size={20} />}
+              tone={below.length ? "" : "good"}
+              value={below.length}
+              label={t("lowStock")}
+            />
+            <Kpi
+              icon={<Siren size={20} />}
+              tone="warn"
+              value={active.length}
+              label={t("activeRequests")}
+            />
+            <Kpi
+              icon={<ClipboardCheck size={20} />}
+              tone="good"
+              value={pending.length}
+              label={t("toValidate")}
+            />
           </div>
-        )}
 
-        {state === 'ready' && (
-          <>
-            <p style={{ color: 'var(--muted-foreground)', margin: 0 }}>{t('centerIntro')}</p>
-
-            <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-              <section style={card}>
-                <div style={{ fontSize: 32, fontWeight: 900, color: low.length ? '#c0392b' : '#2e7d5b' }}>{low.length}</div>
-                <div style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>{t('lowStock')}</div>
-                <Link to="/center/stock" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 14, display: 'inline-block', marginTop: 8 }}>
-                  {t('stock')} →
-                </Link>
-              </section>
-              <section style={card}>
-                <div style={{ fontSize: 32, fontWeight: 900 }}>{active.length}</div>
-                <div style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>{t('ACTIVE')}</div>
-                <Link to="/center/requests" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 14, display: 'inline-block', marginTop: 8 }}>
-                  {t('requests')} →
-                </Link>
-              </section>
-              <section style={card}>
-                <div style={{ fontSize: 32, fontWeight: 900 }}>{stock.reduce((n, s) => n + s.quantitePoches, 0)}</div>
-                <div style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>
-                  {t('bags', { count: stock.reduce((n, s) => n + s.quantitePoches, 0) })}
-                </div>
-                <Link to="/center/stats" style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 14, display: 'inline-block', marginTop: 8 }}>
-                  {t('stats')} →
-                </Link>
-              </section>
+          {below.some((s) => stockLevel(s) === "critical") && (
+            <div className="alert-banner" role="status">
+              <strong>{t("criticalAlert")}</strong>{" "}
+              {below
+                .filter((s) => stockLevel(s) === "critical")
+                .map((s) => s.groupeSanguin)
+                .join(", ")}
             </div>
+          )}
 
-            {low.length > 0 && (
-              <section style={{ ...card, borderInlineStart: '5px solid #c0392b' }}>
-                <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 10 }}>{t('lowStock')}</h2>
-                <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 6 }}>
-                  {low.map((s) => (
-                    <li key={s.id}>
-                      <strong>{s.groupeSanguin}</strong> — {s.quantitePoches} / {t('threshold')} {s.seuilAlerte}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            <section style={card}>
-              <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 14 }}>{t('requests')}</h2>
-              <div style={{ display: 'grid', gap: 10 }}>
-                {active.length === 0 && <p style={{ color: 'var(--muted-foreground)' }}>{t('empty')}</p>}
-                {active.map((r) => (
-                  <div
-                    key={r.id}
-                    style={{ border: '1px solid var(--border, #e5e0df)', borderRadius: 10, padding: 14, display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}
-                  >
-                    <span>
-                      <strong>{r.groupeSanguinDemande}</strong> · {r.quantiteNecessaire} ·{' '}
-                      <span style={{ color: urgenceColor[r.urgence], fontWeight: 800 }}>{t(r.urgence, r.urgence)}</span>
-                    </span>
-                    <span style={{ fontSize: 13, color: 'var(--muted-foreground)' }}>{t('expiration', { date: formatDateTime(r.dateExpiration) })}</span>
-                  </div>
-                ))}
+          <div className="dash-grid">
+            <section className="surface">
+              <div className="surface-head">
+                <h2 className="surface-title">{t("stockLevels")}</h2>
+                <Link to="/center/stock" className="link-more">
+                  {t("manageStock")} <ArrowRight size={14} aria-hidden />
+                </Link>
+              </div>
+              <div className="level-list">
+                {stock.map((s) => {
+                  const level = stockLevel(s);
+                  return (
+                    <div key={s.id} className="level-row">
+                      <span className="blood-badge">{s.groupeSanguin}</span>
+                      <div
+                        className="level-bar"
+                        role="meter"
+                        aria-label={s.groupeSanguin}
+                        aria-valuemin={0}
+                        aria-valuemax={max}
+                        aria-valuenow={s.quantitePoches}
+                      >
+                        <div
+                          className={`level-fill ${level === "ok" ? "" : level}`}
+                          style={{ width: `${(s.quantitePoches / max) * 100}%` }}
+                        />
+                        <div
+                          className="level-marker"
+                          style={{ insetInlineStart: `${(s.seuilAlerte / max) * 100}%` }}
+                          title={`${t("threshold")} ${s.seuilAlerte}`}
+                        />
+                      </div>
+                      <div className="level-meta">
+                        <strong>{s.quantitePoches}</strong> / {s.seuilAlerte}
+                        <div>
+                          <span className={`status ${levelStatusClass[level]}`}>
+                            {t(levelKey[level])}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="level-legend">
+                <span>
+                  <i style={{ background: "var(--success)" }} />
+                  {t("levelOk")}
+                </span>
+                <span>
+                  <i style={{ background: "var(--ochre)" }} />
+                  {t("levelLow")}
+                </span>
+                <span>
+                  <i style={{ background: "var(--primary)" }} />
+                  {t("levelCritical")}
+                </span>
+                <span>
+                  <i style={{ background: "var(--foreground)", opacity: 0.45, width: 2 }} />
+                  {t("threshold")}
+                </span>
               </div>
             </section>
-          </>
-        )}
-      </main>
-    </>
+
+            <div className="stack">
+              <section className="surface">
+                <div className="surface-head">
+                  <h2 className="surface-title">{t("requests")}</h2>
+                  <Link to="/center/requests" className="link-more">
+                    {t("seeAll")} <ArrowRight size={14} aria-hidden />
+                  </Link>
+                </div>
+                {active.length === 0 ? (
+                  <EmptyState>{t("noActiveRequest")}</EmptyState>
+                ) : (
+                  <div className="row-list">
+                    {active.map((r) => (
+                      <Link
+                        key={r.id}
+                        to="/center/responses"
+                        search={{ request: r.id }}
+                        className="row-item"
+                        style={{ color: "inherit" }}
+                      >
+                        <span className="row-main">
+                          <span className="blood-badge">{r.groupeSanguinDemande}</span>
+                          <strong>{t("bags", { count: r.quantiteNecessaire })}</strong>
+                          <span className={`status ${urgenceStatusClass[r.urgence] ?? ""}`}>
+                            {t(r.urgence, r.urgence)}
+                          </span>
+                        </span>
+                        <small>{t("expiration", { date: formatDateTime(r.dateExpiration) })}</small>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="surface">
+                <div className="surface-head">
+                  <h2 className="surface-title">{t("toValidate")}</h2>
+                </div>
+                {pending.length === 0 ? (
+                  <EmptyState>{t("nothingToValidate")}</EmptyState>
+                ) : (
+                  <div className="row-list">
+                    {pending.map((p) => (
+                      <div key={p.don.id} className="row-item">
+                        <span className="row-main">
+                          <span className="blood-badge">{p.donneur.groupeSanguin}</span>
+                          <strong>{p.donneur.nom}</strong>
+                        </span>
+                        <Link
+                          to="/center/responses"
+                          search={{ request: p.demande.id }}
+                          className="btn btn-success btn-sm"
+                        >
+                          {t("validateDonation")}
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          </div>
+        </>
+      )}
+    </AppShell>
+  );
+}
+
+function Kpi({
+  icon,
+  tone,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  tone: string;
+  value: number;
+  label: string;
+}) {
+  return (
+    <div className="kpi">
+      <div className={`kpi-icon ${tone}`} aria-hidden>
+        {icon}
+      </div>
+      <div>
+        <strong>{value}</strong>
+        <span>{label}</span>
+      </div>
+    </div>
   );
 }
