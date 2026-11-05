@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
-import { Menu, X } from 'lucide-react';
+import { useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
+import { Menu, X } from "lucide-react";
 
-import { useSession } from '@/hooks/use-session';
-import { clearSession, roleHome } from '@/api/session';
-import { Brand } from './logo';
-import { LanguageSelect } from './language-select';
+import { useSession } from "@/hooks/use-session";
+import { clearSession, roleHome } from "@/api/session";
+import { Brand } from "./logo";
+import { LanguageSelect } from "./language-select";
 
 export function SiteHeader() {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ export function SiteHeader() {
   const logout = () => {
     clearSession();
     setOpen(false);
-    void navigate({ to: '/', replace: true });
+    void navigate({ to: "/", replace: true });
   };
 
   return (
@@ -27,17 +27,17 @@ export function SiteHeader() {
           <Brand />
         </Link>
         <nav aria-label="Principal" className="desktop-nav">
-          <Link to="/" className="nav-link" activeProps={{ 'data-status': 'active' }}>
-            {t('home')}
+          <Link to="/" className="nav-link" activeProps={{ "data-status": "active" }}>
+            {t("home")}
           </Link>
           <Link to="/" hash="how" className="nav-link">
-            {t('how')}
+            {t("how")}
           </Link>
           <Link to="/" hash="centers" className="nav-link">
-            {t('centers')}
+            {t("centers")}
           </Link>
           <Link to="/" hash="compat" className="nav-link">
-            {t('compatibility')}
+            {t("compatibility")}
           </Link>
         </nav>
         <div className="header-actions">
@@ -45,27 +45,31 @@ export function SiteHeader() {
           {session ? (
             <>
               {/* Cast: the donor/center routes are not in the generated route tree yet. */}
-              <Link to={roleHome(session.role) as '/'} className="nav-link" style={{ fontWeight: 700 }}>
-                {session.role === 'CENTRE' ? t('centerSpace') : t('donorSpace')}
+              <Link
+                to={roleHome(session.role) as "/"}
+                className="nav-link"
+                style={{ fontWeight: 700 }}
+              >
+                {session.role === "CENTRE" ? t("centerSpace") : t("donorSpace")}
               </Link>
               <button type="button" className="nav-link" onClick={logout}>
-                {t('logout')}
+                {t("logout")}
               </button>
             </>
           ) : (
             <>
               <Link to="/login" className="nav-link">
-                {t('login')}
+                {t("login")}
               </Link>
               <Link to="/register" className="nav-link" style={{ fontWeight: 700 }}>
-                {t('register')}
+                {t("register")}
               </Link>
             </>
           )}
         </div>
         <button
           type="button"
-          aria-label={t('menu')}
+          aria-label={t("menu")}
           aria-expanded={open}
           className="menu-toggle"
           onClick={() => setOpen((v) => !v)}
@@ -74,29 +78,29 @@ export function SiteHeader() {
         </button>
       </div>
       {open && (
-        <nav className="mobile-nav" aria-label={t('menu')}>
+        <nav className="mobile-nav" aria-label={t("menu")}>
           <Link to="/" onClick={() => setOpen(false)}>
-            {t('home')}
+            {t("home")}
           </Link>
           <Link to="/" hash="how" onClick={() => setOpen(false)}>
-            {t('how')}
+            {t("how")}
           </Link>
           {session ? (
             <>
-              <Link to={roleHome(session.role) as '/'} onClick={() => setOpen(false)}>
-                {session.role === 'CENTRE' ? t('centerSpace') : t('donorSpace')}
+              <Link to={roleHome(session.role) as "/"} onClick={() => setOpen(false)}>
+                {session.role === "CENTRE" ? t("centerSpace") : t("donorSpace")}
               </Link>
               <button type="button" onClick={logout}>
-                {t('logout')}
+                {t("logout")}
               </button>
             </>
           ) : (
             <>
               <Link to="/login" onClick={() => setOpen(false)}>
-                {t('login')}
+                {t("login")}
               </Link>
               <Link to="/register" onClick={() => setOpen(false)}>
-                {t('register')}
+                {t("register")}
               </Link>
             </>
           )}

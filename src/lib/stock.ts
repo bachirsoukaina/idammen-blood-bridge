@@ -35,3 +35,10 @@ export function gaugeMax(stock: StockSang[]): number {
 export function isRequestExpired(r: { statut: string; dateExpiration: string }): boolean {
   return r.statut === "EXPIREE" || new Date(r.dateExpiration).getTime() < Date.now();
 }
+
+/** CSS status class for each urgency level of a request. */
+export const urgenceStatusClass: Record<string, string> = {
+  CRITIQUE: "",
+  URGENTE: "warn",
+  NORMALE: "info",
+};

@@ -1,16 +1,21 @@
-import { CircleMarker, MapContainer, Popup, TileLayer } from 'react-leaflet';
+import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 
-import type { MapMarker, MapViewProps } from './map-types';
+import type { MapMarker, MapViewProps } from "./map-types";
 
 const COLORS: Record<string, string> = {
-  eligible: '#3a7d5c',
-  ineligible: '#8a8a8a',
-  center: '#b5332a',
+  eligible: "#3a7d5c",
+  ineligible: "#8a8a8a",
+  center: "#b5332a",
 };
 
 export function MapInner({ center, zoom = 6, markers }: MapViewProps) {
   return (
-    <MapContainer center={center} zoom={zoom} scrollWheelZoom style={{ height: '100%', width: '100%' }}>
+    <MapContainer
+      center={center}
+      zoom={zoom}
+      scrollWheelZoom
+      style={{ height: "100%", width: "100%" }}
+    >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -21,9 +26,9 @@ export function MapInner({ center, zoom = 6, markers }: MapViewProps) {
           center={[m.latitude, m.longitude]}
           radius={8}
           pathOptions={{
-            color: '#fff',
+            color: "#fff",
             weight: 2,
-            fillColor: COLORS[m.kind ?? 'eligible'],
+            fillColor: COLORS[m.kind ?? "eligible"],
             fillOpacity: 1,
           }}
         >

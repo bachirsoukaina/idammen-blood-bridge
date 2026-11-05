@@ -8,7 +8,13 @@ import { requestApi } from "@/api/requestApi";
 import type { Centre, DemandeDon, DonorResponse, StockSang } from "@/api/models";
 import { errorMessage } from "@/lib/errors";
 import { formatDateTime } from "@/lib/format";
-import { gaugeMax, isRequestExpired, levelStatusClass, stockLevel } from "@/lib/stock";
+import {
+  gaugeMax,
+  isRequestExpired,
+  levelStatusClass,
+  stockLevel,
+  urgenceStatusClass,
+} from "@/lib/stock";
 import { RoleGuard } from "@/components/role-guard";
 import { AppShell, EmptyState, PageError, PageLoading } from "@/components/app-shell";
 
@@ -20,12 +26,6 @@ export const Route = createFileRoute("/center/dashboard")({
     </RoleGuard>
   ),
 });
-
-export const urgenceStatusClass: Record<string, string> = {
-  CRITIQUE: "",
-  URGENTE: "warn",
-  NORMALE: "info",
-};
 
 const levelKey = { critical: "levelCritical", low: "levelLow", ok: "levelOk" } as const;
 

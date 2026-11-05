@@ -12,8 +12,7 @@ import { errorMessage } from "@/lib/errors";
 import { formatDateTime } from "@/lib/format";
 import { RoleGuard } from "@/components/role-guard";
 import { AppShell, EmptyState, PageError, PageLoading } from "@/components/app-shell";
-import { isRequestExpired } from "@/lib/stock";
-import { urgenceStatusClass } from "./center.dashboard";
+import { isRequestExpired, urgenceStatusClass } from "@/lib/stock";
 
 export const Route = createFileRoute("/center/requests")({
   head: () => ({ meta: [{ title: "Demandes urgentes — Idammen" }] }),

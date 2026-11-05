@@ -1,6 +1,6 @@
-import { useEffect, useState, type ComponentType } from 'react';
+import { useEffect, useState, type ComponentType } from "react";
 
-import type { MapViewProps } from './map-types';
+import type { MapViewProps } from "./map-types";
 
 /**
  * Browser-only wrapper around Leaflet. The map module (which imports Leaflet)
@@ -12,7 +12,7 @@ export function MapView(props: MapViewProps) {
 
   useEffect(() => {
     let alive = true;
-    void import('./map-inner').then((m) => {
+    void import("./map-inner").then((m) => {
       if (alive) setInner(() => m.MapInner);
     });
     return () => {
@@ -21,11 +21,11 @@ export function MapView(props: MapViewProps) {
   }, []);
 
   return (
-    <div className={`map-frame${props.large ? ' large' : ''}`}>
+    <div className={`map-frame${props.large ? " large" : ""}`}>
       {Inner ? (
         <Inner {...props} />
       ) : (
-        <div aria-hidden="true" style={{ height: '100%', background: 'var(--muted)' }} />
+        <div aria-hidden="true" style={{ height: "100%", background: "var(--muted)" }} />
       )}
     </div>
   );

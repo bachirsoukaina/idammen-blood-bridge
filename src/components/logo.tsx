@@ -1,4 +1,4 @@
-export function LogoMark({ className = 'brand-mark' }: { className?: string }) {
+export function LogoMark({ className = "brand-mark" }: { className?: string }) {
   return (
     <svg viewBox="0 0 40 46" className={className} aria-hidden="true" focusable="false">
       <path
@@ -24,10 +24,10 @@ export function Brand({ light = false }: { light?: boolean }) {
     <span className="brand">
       <LogoMark />
       <span>
-        <span className="brand-name" style={light ? { color: 'inherit' } : undefined}>
+        <span className="brand-name" style={light ? { color: "inherit" } : undefined}>
           Idammen
         </span>
-        <span className="brand-sub" style={{ display: 'block' }}>
+        <span className="brand-sub" style={{ display: "block" }}>
           BLOODLINK
         </span>
       </span>

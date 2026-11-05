@@ -1,10 +1,236 @@
-import { bloodGroups, cities, type Donneur, type Centre, type StockSang, type DemandeDon, type Don, type DonorResponse, type PointsDonneur, type Recompense, type EchangeRecompense } from './models';
-import {decodeToken,readToken} from './session';
-export const centers:Centre[]=cities.map((c,i)=>({id:i+1,nom:`Centre ${c.key} Solidarité`,adresse:c.key,latitude:c.latitude,longitude:c.longitude,telephone:'+212 522 45 67 89'}));
-const center=centers[0] as Centre;
-export const donor:Donneur={id:1,nom:'Youssef El Amrani',email:'youssef@example.ma',telephone:'+212 612 34 56 78',groupeSanguin:'O+',dateNaissance:'1995-04-17',poids:74,latitude:33.5831,longitude:-7.5998,dateDernierDon:'2026-06-12',statutEligibilite:'ELIGIBLE'};
-export const mockDb={donor,center,stock:bloodGroups.map((g,i)=>({id:i+1,centreId:1,groupeSanguin:g,quantitePoches:[28,8,19,4,12,3,35,6][i]??0,seuilAlerte:10,dateMAJ:new Date().toISOString()})) as StockSang[],requests:[{id:1,centreId:1,groupeSanguinDemande:'O+',quantiteNecessaire:12,urgence:'CRITIQUE',statut:'ACTIVE',dateCreation:'2026-10-14',dateExpiration:'2026-12-20T18:00:00Z',centre:center},{id:2,centreId:1,groupeSanguinDemande:'O+',quantiteNecessaire:6,urgence:'URGENTE',statut:'ACTIVE',dateCreation:'2026-10-13',dateExpiration:'2026-12-25T12:00:00Z',centre:center},{id:3,centreId:1,groupeSanguinDemande:'A-',quantiteNecessaire:8,urgence:'NORMALE',statut:'EXPIREE',dateCreation:'2026-09-01',dateExpiration:'2026-09-03',centre:center}] as DemandeDon[],donations:[{id:1,donneurId:1,centreId:1,demandeId:0,quantite:1,datePrelevement:'2026-06-12',statut:'VALIDE',centre:center},{id:2,donneurId:1,centreId:1,demandeId:0,quantite:1,datePrelevement:'2026-02-10',statut:'VALIDE',centre:center}] as Don[],points:{id:1,donneurId:1,pointsActuels:350,niveau:'Argent',nombreDonsTotal:5,progression:70,prochainNiveau:'Or',pointsProchainNiveau:150} as PointsDonneur,rewards:[{id:1,nom:'Bilan santé',description:'Bilan partenaire',coutPoints:250,type:'SANTE',stockDisponible:8,translationKey:'reward1'},{id:2,nom:'Bon librairie',description:'Bon partenaire',coutPoints:150,type:'BON',stockDisponible:12,translationKey:'reward2'},{id:3,nom:'Certificat solidaire',description:'Certificat',coutPoints:100,type:'CERTIFICAT',stockDisponible:50,translationKey:'reward3'}] as Recompense[],exchanges:[] as EchangeRecompense[],responses:[] as DonorResponse[]};
-mockDb.responses=[{donneur:donor,reponse:'CONFIRME',don:{id:10,donneurId:1,centreId:1,demandeId:1,quantite:1,datePrelevement:'2026-10-14',statut:'PLANIFIE'}},{donneur:{...donor,id:2,nom:'Fatima Zahra Benali',groupeSanguin:'O-',latitude:33.565,longitude:-7.605},reponse:'DECLINE',don:{id:11,donneurId:2,centreId:1,demandeId:1,quantite:1,datePrelevement:'2026-10-14',statut:'PLANIFIE'}},{donneur:{...donor,id:3,nom:'Karim Bouzid',groupeSanguin:'O+',latitude:33.59,longitude:-7.57,statutEligibilite:'NON_ELIGIBLE'},reponse:'SANS_REPONSE',don:{id:12,donneurId:3,centreId:1,demandeId:1,quantite:1,datePrelevement:'2026-10-14',statut:'PLANIFIE'}}];
-export function requireMockRole(role:'DONNEUR'|'CENTRE'){const token=readToken();const claims=token?decodeToken(token):null;if(claims?.role!==role)throw new Error('error');}
-export function validateMockDonation(id:number){requireMockRole('CENTRE');const row=mockDb.responses.find(r=>r.don.id===id);if(!row||row.reponse!=='CONFIRME'||row.don.statut==='VALIDE')throw new Error('error');row.don.statut='VALIDE';row.don.datePrelevement=new Date().toISOString();mockDb.donations.push({...row.don,centre:center});const stock=mockDb.stock.find(s=>s.groupeSanguin===row.donneur.groupeSanguin);if(stock)stock.quantitePoches+=row.don.quantite;return row.don;}
-export function exchangeMockReward(id:number){requireMockRole('DONNEUR');const reward=mockDb.rewards.find(r=>r.id===id);if(!reward||reward.stockDisponible<1||mockDb.points.pointsActuels<reward.coutPoints)throw new Error('error');mockDb.points.pointsActuels-=reward.coutPoints;reward.stockDisponible-=1;const exchange:EchangeRecompense={id:mockDb.exchanges.length+1,donneurId:1,recompenseId:id,dateEchange:new Date().toISOString(),statut:'DISPONIBLE',codeUtilisation:`IDA-${crypto.randomUUID().slice(0,8).toUpperCase()}`};mockDb.exchanges.push(exchange);return exchange;}
+import {
+  bloodGroups,
+  cities,
+  type Donneur,
+  type Centre,
+  type StockSang,
+  type DemandeDon,
+  type Don,
+  type DonorResponse,
+  type PointsDonneur,
+  type Recompense,
+  type EchangeRecompense,
+} from "./models";
+import { decodeToken, readToken } from "./session";
+export const centers: Centre[] = cities.map((c, i) => ({
+  id: i + 1,
+  nom: `Centre ${c.key} Solidarité`,
+  adresse: c.key,
+  latitude: c.latitude,
+  longitude: c.longitude,
+  telephone: "+212 522 45 67 89",
+}));
+const center = centers[0] as Centre;
+export const donor: Donneur = {
+  id: 1,
+  nom: "Youssef El Amrani",
+  email: "youssef@example.ma",
+  telephone: "+212 612 34 56 78",
+  groupeSanguin: "O+",
+  dateNaissance: "1995-04-17",
+  poids: 74,
+  latitude: 33.5831,
+  longitude: -7.5998,
+  dateDernierDon: "2026-06-12",
+  statutEligibilite: "ELIGIBLE",
+};
+export const mockDb = {
+  donor,
+  center,
+  stock: bloodGroups.map((g, i) => ({
+    id: i + 1,
+    centreId: 1,
+    groupeSanguin: g,
+    quantitePoches: [28, 8, 19, 4, 12, 3, 35, 6][i] ?? 0,
+    seuilAlerte: 10,
+    dateMAJ: new Date().toISOString(),
+  })) as StockSang[],
+  requests: [
+    {
+      id: 1,
+      centreId: 1,
+      groupeSanguinDemande: "O+",
+      quantiteNecessaire: 12,
+      urgence: "CRITIQUE",
+      statut: "ACTIVE",
+      dateCreation: "2026-10-14",
+      dateExpiration: "2026-12-20T18:00:00Z",
+      centre: center,
+    },
+    {
+      id: 2,
+      centreId: 1,
+      groupeSanguinDemande: "O+",
+      quantiteNecessaire: 6,
+      urgence: "URGENTE",
+      statut: "ACTIVE",
+      dateCreation: "2026-10-13",
+      dateExpiration: "2026-12-25T12:00:00Z",
+      centre: center,
+    },
+    {
+      id: 3,
+      centreId: 1,
+      groupeSanguinDemande: "A-",
+      quantiteNecessaire: 8,
+      urgence: "NORMALE",
+      statut: "EXPIREE",
+      dateCreation: "2026-09-01",
+      dateExpiration: "2026-09-03",
+      centre: center,
+    },
+  ] as DemandeDon[],
+  donations: [
+    {
+      id: 1,
+      donneurId: 1,
+      centreId: 1,
+      demandeId: 0,
+      quantite: 1,
+      datePrelevement: "2026-06-12",
+      statut: "VALIDE",
+      centre: center,
+    },
+    {
+      id: 2,
+      donneurId: 1,
+      centreId: 1,
+      demandeId: 0,
+      quantite: 1,
+      datePrelevement: "2026-02-10",
+      statut: "VALIDE",
+      centre: center,
+    },
+  ] as Don[],
+  points: {
+    id: 1,
+    donneurId: 1,
+    pointsActuels: 350,
+    niveau: "Argent",
+    nombreDonsTotal: 5,
+    progression: 70,
+    prochainNiveau: "Or",
+    pointsProchainNiveau: 150,
+  } as PointsDonneur,
+  rewards: [
+    {
+      id: 1,
+      nom: "Bilan santé",
+      description: "Bilan partenaire",
+      coutPoints: 250,
+      type: "SANTE",
+      stockDisponible: 8,
+      translationKey: "reward1",
+    },
+    {
+      id: 2,
+      nom: "Bon librairie",
+      description: "Bon partenaire",
+      coutPoints: 150,
+      type: "BON",
+      stockDisponible: 12,
+      translationKey: "reward2",
+    },
+    {
+      id: 3,
+      nom: "Certificat solidaire",
+      description: "Certificat",
+      coutPoints: 100,
+      type: "CERTIFICAT",
+      stockDisponible: 50,
+      translationKey: "reward3",
+    },
+  ] as Recompense[],
+  exchanges: [] as EchangeRecompense[],
+  responses: [] as DonorResponse[],
+};
+mockDb.responses = [
+  {
+    donneur: donor,
+    reponse: "CONFIRME",
+    don: {
+      id: 10,
+      donneurId: 1,
+      centreId: 1,
+      demandeId: 1,
+      quantite: 1,
+      datePrelevement: "2026-10-14",
+      statut: "PLANIFIE",
+    },
+  },
+  {
+    donneur: {
+      ...donor,
+      id: 2,
+      nom: "Fatima Zahra Benali",
+      groupeSanguin: "O-",
+      latitude: 33.565,
+      longitude: -7.605,
+    },
+    reponse: "DECLINE",
+    don: {
+      id: 11,
+      donneurId: 2,
+      centreId: 1,
+      demandeId: 1,
+      quantite: 1,
+      datePrelevement: "2026-10-14",
+      statut: "PLANIFIE",
+    },
+  },
+  {
+    donneur: {
+      ...donor,
+      id: 3,
+      nom: "Karim Bouzid",
+      groupeSanguin: "O+",
+      latitude: 33.59,
+      longitude: -7.57,
+      statutEligibilite: "NON_ELIGIBLE",
+    },
+    reponse: "SANS_REPONSE",
+    don: {
+      id: 12,
+      donneurId: 3,
+      centreId: 1,
+      demandeId: 1,
+      quantite: 1,
+      datePrelevement: "2026-10-14",
+      statut: "PLANIFIE",
+    },
+  },
+];
+export function requireMockRole(role: "DONNEUR" | "CENTRE") {
+  const token = readToken();
+  const claims = token ? decodeToken(token) : null;
+  if (claims?.role !== role) throw new Error("error");
+}
+export function validateMockDonation(id: number) {
+  requireMockRole("CENTRE");
+  const row = mockDb.responses.find((r) => r.don.id === id);
+  if (!row || row.reponse !== "CONFIRME" || row.don.statut === "VALIDE") throw new Error("error");
+  row.don.statut = "VALIDE";
+  row.don.datePrelevement = new Date().toISOString();
+  mockDb.donations.push({ ...row.don, centre: center });
+  const stock = mockDb.stock.find((s) => s.groupeSanguin === row.donneur.groupeSanguin);
+  if (stock) stock.quantitePoches += row.don.quantite;
+  return row.don;
+}
+export function exchangeMockReward(id: number) {
+  requireMockRole("DONNEUR");
+  const reward = mockDb.rewards.find((r) => r.id === id);
+  if (!reward || reward.stockDisponible < 1 || mockDb.points.pointsActuels < reward.coutPoints)
+    throw new Error("error");
+  mockDb.points.pointsActuels -= reward.coutPoints;
+  reward.stockDisponible -= 1;
+  const exchange: EchangeRecompense = {
+    id: mockDb.exchanges.length + 1,
+    donneurId: 1,
+    recompenseId: id,
+    dateEchange: new Date().toISOString(),
+    statut: "DISPONIBLE",
+    codeUtilisation: `IDA-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+  };
+  mockDb.exchanges.push(exchange);
+  return exchange;
+}

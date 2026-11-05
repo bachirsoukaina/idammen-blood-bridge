@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { decodeToken, readToken } from '@/api/session';
-import type { Role } from '@/api/models';
+import { useEffect, useState } from "react";
+import { decodeToken, readToken } from "@/api/session";
+import type { Role } from "@/api/models";
 
 export interface Session {
   token: string;
@@ -9,7 +9,7 @@ export interface Session {
 }
 
 function readSession(): Session | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   const token = readToken();
   if (!token) return null;
   const claims = decodeToken(token);
@@ -27,11 +27,11 @@ export function useSession(): Session | null {
   useEffect(() => {
     const update = () => setSession(readSession());
     update();
-    window.addEventListener('bloodlink-session', update);
-    window.addEventListener('storage', update);
+    window.addEventListener("bloodlink-session", update);
+    window.addEventListener("storage", update);
     return () => {
-      window.removeEventListener('bloodlink-session', update);
-      window.removeEventListener('storage', update);
+      window.removeEventListener("bloodlink-session", update);
+      window.removeEventListener("storage", update);
     };
   }, []);
 

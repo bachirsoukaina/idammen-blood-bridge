@@ -30,4 +30,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-package-lock.json
+
+# Variables locales
+.env
+.env.*
+!.env.example

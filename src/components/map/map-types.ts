@@ -3,7 +3,7 @@ export interface MapMarker {
   longitude: number;
   label: string;
   detail?: string;
-  kind?: 'eligible' | 'ineligible' | 'center';
+  kind?: "eligible" | "ineligible" | "center";
 }
 
 export interface MapViewProps {
