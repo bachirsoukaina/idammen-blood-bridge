@@ -6,18 +6,18 @@ Membre 4 (frontend) — projet SCRUM sur Jira.
 
 ## Technologies
 
-| Rôle | Outil |
-|---|---|
-| Interface | React 19 + TypeScript |
-| Build et serveur de dev | Vite |
-| Navigation | TanStack Router (une page = un fichier dans `src/routes/`) |
-| Styles | Tailwind CSS 4 + `src/styles.css` |
-| Langues | react-i18next : français, arabe (RTL), tamazight (tifinagh) |
-| Carte | Leaflet / OpenStreetMap |
-| Graphiques | Recharts |
-| Formulaires | react-hook-form + Zod |
-| Tests | Vitest + Testing Library |
-| Production | Nginx (image Docker non root) |
+| Rôle                    | Outil                                                       |
+| ----------------------- | ----------------------------------------------------------- |
+| Interface               | React 19 + TypeScript                                       |
+| Build et serveur de dev | Vite                                                        |
+| Navigation              | TanStack Router (une page = un fichier dans `src/routes/`)  |
+| Styles                  | Tailwind CSS 4 + `src/styles.css`                           |
+| Langues                 | react-i18next : français, arabe (RTL), tamazight (tifinagh) |
+| Carte                   | Leaflet / OpenStreetMap                                     |
+| Graphiques              | Recharts                                                    |
+| Formulaires             | react-hook-form + Zod                                       |
+| Tests                   | Vitest + Testing Library                                    |
+| Production              | Nginx (image Docker non root)                               |
 
 ## Démarrer en local
 
@@ -33,23 +33,23 @@ Ouvrir http://localhost:5173 (le port 8080 est réservé à l'API Gateway).
 
 ### Mode mock ou mode réel
 
-| Variable | Valeur | Effet |
-|---|---|---|
-| `VITE_USE_MOCK` | `true` (défaut) | API simulée en mémoire, comptes de démonstration. Un rechargement de page remet les données à zéro. |
-| `VITE_USE_MOCK` | `false` | Toutes les requêtes partent vers la gateway. Le bloc de démonstration disparaît de la page de connexion. |
-| `VITE_API_URL` | `http://localhost:8080` | Adresse de l'API Gateway |
+| Variable        | Valeur                  | Effet                                                                                                    |
+| --------------- | ----------------------- | -------------------------------------------------------------------------------------------------------- |
+| `VITE_USE_MOCK` | `true` (défaut)         | API simulée en mémoire, comptes de démonstration. Un rechargement de page remet les données à zéro.      |
+| `VITE_USE_MOCK` | `false`                 | Toutes les requêtes partent vers la gateway. Le bloc de démonstration disparaît de la page de connexion. |
+| `VITE_API_URL`  | `http://localhost:8080` | Adresse de l'API Gateway                                                                                 |
 
 Comptes de démonstration (mode mock) : toute adresse e-mail avec un mot de passe de 8 caractères ou plus ouvre l'espace donneur ; `centre@example.ma` ouvre le portail centre.
 
 ## Commandes
 
-| Commande | Rôle |
-|---|---|
-| `npm run dev` | Serveur de développement |
-| `npm run build` | Vérification TypeScript puis site statique dans `dist/` |
-| `npm run preview` | Sert `dist/` en local (port 4173) |
-| `npm test` | Tests automatiques |
-| `npm run lint` | ESLint + Prettier |
+| Commande          | Rôle                                                    |
+| ----------------- | ------------------------------------------------------- |
+| `npm run dev`     | Serveur de développement                                |
+| `npm run build`   | Vérification TypeScript puis site statique dans `dist/` |
+| `npm run preview` | Sert `dist/` en local (port 4173)                       |
+| `npm test`        | Tests automatiques                                      |
+| `npm run lint`    | ESLint + Prettier                                       |
 
 ## Docker (SCRUM-98)
 
@@ -69,18 +69,18 @@ docker build --build-arg VITE_USE_MOCK=true -t bloodlink-frontend:demo .
 Bloc à ajouter au `docker-compose.yml` de l'équipe :
 
 ```yaml
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_USE_MOCK: "false"
-        VITE_API_URL: http://localhost:8080
-    environment:
-      API_ORIGIN: http://localhost:8080
-    ports:
-      - "5173:8080"
-    depends_on:
-      - api-gateway
+frontend:
+  build:
+    context: ./frontend
+    args:
+      VITE_USE_MOCK: "false"
+      VITE_API_URL: http://localhost:8080
+  environment:
+    API_ORIGIN: http://localhost:8080
+  ports:
+    - "5173:8080"
+  depends_on:
+    - api-gateway
 ```
 
 Le navigateur appelle la gateway directement : elle doit autoriser l'origine `http://localhost:5173` (CORS).
@@ -96,14 +96,14 @@ Le navigateur appelle la gateway directement : elle doit autoriser l'origine `ht
 
 ## Organisation du code
 
-| Dossier | Contenu |
-|---|---|
-| `src/api/` | Un fichier par service (`authApi`, `donorApi`, `requestApi`, `centerApi`, `loyaltyApi`), client HTTP avec JWT, mock |
-| `src/routes/` | Les pages (`donor.*`, `center.*`, `login`, `register`, `index`) |
-| `src/components/` | En-tête, mise en page commune (`app-shell`), garde de rôle, carte, composants shadcn (`ui/`) |
-| `src/i18n/` | `fr.json`, `ar.json`, `zgh.json` |
-| `src/lib/` | Formatage des dates (Africa/Casablanca), niveaux de stock, erreurs |
-| `docker/` | Configuration Nginx |
+| Dossier           | Contenu                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `src/api/`        | Un fichier par service (`authApi`, `donorApi`, `requestApi`, `centerApi`, `loyaltyApi`), client HTTP avec JWT, mock |
+| `src/routes/`     | Les pages (`donor.*`, `center.*`, `login`, `register`, `index`)                                                     |
+| `src/components/` | En-tête, mise en page commune (`app-shell`), garde de rôle, carte, composants shadcn (`ui/`)                        |
+| `src/i18n/`       | `fr.json`, `ar.json`, `zgh.json`                                                                                    |
+| `src/lib/`        | Formatage des dates (Africa/Casablanca), niveaux de stock, erreurs                                                  |
+| `docker/`         | Configuration Nginx                                                                                                 |
 
 ## Sécurité côté navigateur
 
