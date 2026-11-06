@@ -143,18 +143,22 @@ function DonorProfilePage() {
                 <div className="field">
                   <label htmlFor="nom">{t("name")}</label>
                   <input id="nom" {...form.register("nom")} />
-                  {errors.nom && <span className="field-error">{errors.nom.message}</span>}
+                  {errors.nom && (
+                    <span className="field-error">{t(errors.nom.message ?? "invalid")}</span>
+                  )}
                 </div>
                 <div className="field">
                   <label htmlFor="email">{t("email")}</label>
                   <input id="email" type="email" {...form.register("email")} />
-                  {errors.email && <span className="field-error">{errors.email.message}</span>}
+                  {errors.email && (
+                    <span className="field-error">{t(errors.email.message ?? "invalid")}</span>
+                  )}
                 </div>
                 <div className="field">
                   <label htmlFor="telephone">{t("phone")}</label>
                   <input id="telephone" type="tel" {...form.register("telephone")} />
                   {errors.telephone && (
-                    <span className="field-error">{errors.telephone.message}</span>
+                    <span className="field-error">{t(errors.telephone.message ?? "invalid")}</span>
                   )}
                 </div>
                 <div className="field">
@@ -167,20 +171,26 @@ function DonorProfilePage() {
                     ))}
                   </select>
                   {errors.groupeSanguin && (
-                    <span className="field-error">{errors.groupeSanguin.message}</span>
+                    <span className="field-error">
+                      {t(errors.groupeSanguin.message ?? "invalid")}
+                    </span>
                   )}
                 </div>
                 <div className="field">
                   <label htmlFor="dateNaissance">{t("birthDate")}</label>
                   <input id="dateNaissance" type="date" {...form.register("dateNaissance")} />
                   {errors.dateNaissance && (
-                    <span className="field-error">{errors.dateNaissance.message}</span>
+                    <span className="field-error">
+                      {t(errors.dateNaissance.message ?? "invalid")}
+                    </span>
                   )}
                 </div>
                 <div className="field">
                   <label htmlFor="poids">{t("weight")}</label>
                   <input id="poids" type="number" min={1} {...form.register("poids")} />
-                  {errors.poids && <span className="field-error">{errors.poids.message}</span>}
+                  {errors.poids && (
+                    <span className="field-error">{t(errors.poids.message ?? "invalid")}</span>
+                  )}
                 </div>
                 <div className="field">
                   <label htmlFor="city">{t("city")}</label>

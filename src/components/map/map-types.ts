@@ -3,7 +3,8 @@ export interface MapMarker {
   longitude: number;
   label: string;
   detail?: string;
-  kind?: "eligible" | "ineligible" | "center";
+  /** eligible / ineligible: donors; center; ok / low / critical: center colored by its reserves; me: the viewer. */
+  kind?: "eligible" | "ineligible" | "center" | "ok" | "low" | "critical" | "me";
 }
 
 export interface MapViewProps {

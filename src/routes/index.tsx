@@ -1,13 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Bell, Building2, CheckCircle2, Gift, HandHeart, Users } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  Building2,
+  CheckCircle2,
+  Droplets,
+  Gift,
+  HandHeart,
+  ShieldCheck,
+  Siren,
+} from "lucide-react";
 
 import heroPhoto from "@/assets/idammen-community.jpg";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MapView } from "@/components/map/map-view";
 import { cities, bloodGroups } from "@/api/models";
-import { centers } from "@/api/mock";
+import { ReserveDrop } from "@/components/reserves/reserve-drop";
+import { useReserves } from "@/hooks/use-reserves";
+import { nationalReserves, worstLevel } from "@/lib/reserves";
+import { stockLevel } from "@/lib/stock";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,6 +56,10 @@ const COMPAT: { group: string; gives: string; receives: string }[] = [
 
 function Home() {
   const { t } = useTranslation();
+  const { reserves } = useReserves();
+  const national = nationalReserves(reserves);
+  const totalBags = national.reduce((n, r) => n + r.quantitePoches, 0);
+  const tension = national.filter((r) => stockLevel(r) !== "ok").length;
 
   return (
     <>
@@ -112,40 +129,61 @@ function Home() {
           </div>
         </section>
 
-        <section className="stat-strip" aria-label={t("demoData")}>
-          <div
-            className="container-id"
-            style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)" }}
-          >
+        <section className="stat-strip" aria-label={t("todayReserves")}>
+          <div className="container-id stat-grid">
             <div className="stat-item">
               <span className="stat-icon">
                 <Building2 size={22} />
               </span>
               <span>
-                <span className="stat-number">{centers.length}</span>
+                <span className="stat-number">{reserves.length || "—"}</span>
                 <span className="stat-label">{t("partners")}</span>
               </span>
             </div>
             <div className="stat-item">
               <span className="stat-icon">
-                <Users size={22} />
+                <Droplets size={22} />
               </span>
               <span>
-                <span className="stat-number">2 450</span>
-                <span className="stat-label">{t("donors")}</span>
+                <span className="stat-number">
+                  {totalBags ? totalBags.toLocaleString("fr-FR") : "—"}
+                </span>
+                <span className="stat-label">{t("bagsNational")}</span>
               </span>
             </div>
             <div className="stat-item">
               <span className="stat-icon">
-                <Gift size={22} />
+                <Siren size={22} />
               </span>
               <span>
-                <span className="stat-number">158</span>
-                <span className="stat-label">{t("bagsMonth")}</span>
+                <span className="stat-number">{reserves.length ? tension : "—"}</span>
+                <span className="stat-label">{t("groupsInTension")}</span>
               </span>
             </div>
           </div>
         </section>
+
+        {reserves.length > 0 && (
+          <section className="section" id="reserves">
+            <div className="container-id">
+              <div className="surface-head" style={{ marginBottom: 26 }}>
+                <div>
+                  <span className="eyebrow">{t("reserves")}</span>
+                  <h2 className="section-title">{t("todayReserves")}</h2>
+                  <p className="section-description">{t("todayReservesText")}</p>
+                </div>
+                <Link to="/reserves" className="btn btn-outline">
+                  {t("seeReserves")} <ArrowRight size={16} aria-hidden />
+                </Link>
+              </div>
+              <div className="drop-grid">
+                {national.map((r) => (
+                  <ReserveDrop key={r.groupeSanguin} reserve={r} size={76} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="section" id="how">
           <div className="container-id">
@@ -188,14 +226,31 @@ function Home() {
             <MapView
               center={[31.8, -7.5]}
               zoom={5}
-              markers={centers.map((c) => ({
-                latitude: c.latitude,
-                longitude: c.longitude,
-                label: c.nom,
-                detail: c.adresse,
-                kind: "center",
+              markers={reserves.map((r) => ({
+                latitude: r.centre.latitude,
+                longitude: r.centre.longitude,
+                label: r.centre.nom,
+                detail: r.centre.adresse,
+                kind: worstLevel(r.stock),
               }))}
             />
+          </div>
+        </section>
+
+        <section className="section">
+          <div className="container-id">
+            <div className="pro-band">
+              <div>
+                <span className="eyebrow" style={{ color: "var(--ochre)" }}>
+                  <ShieldCheck size={14} aria-hidden /> {t("proSpace")}
+                </span>
+                <h2>{t("proBandTitle")}</h2>
+                <p>{t("proBandText")}</p>
+              </div>
+              <Link to="/login" search={{ espace: "centre" }} className="btn btn-primary">
+                {t("proBandCta")} <ArrowRight size={16} aria-hidden />
+              </Link>
+            </div>
           </div>
         </section>
 

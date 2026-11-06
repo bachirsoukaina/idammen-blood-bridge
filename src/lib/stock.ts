@@ -14,7 +14,7 @@ export type StockLevel = "critical" | "low" | "ok";
  * - ok: above the threshold.
  * The "half the threshold" cut-off is a display choice, not a medical rule.
  */
-export function stockLevel(s: StockSang): StockLevel {
+export function stockLevel(s: Pick<StockSang, "quantitePoches" | "seuilAlerte">): StockLevel {
   if (s.quantitePoches <= s.seuilAlerte / 2) return "critical";
   if (s.quantitePoches <= s.seuilAlerte) return "low";
   return "ok";

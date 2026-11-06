@@ -27,16 +27,16 @@ export function SiteHeader() {
           <Brand />
         </Link>
         <nav aria-label="Principal" className="desktop-nav">
-          <Link to="/" className="nav-link" activeProps={{ "data-status": "active" }}>
-            {t("home")}
-          </Link>
-          <Link to="/" hash="how" className="nav-link">
+          <Link to="/" hash="how" className="nav-link" activeProps={{}}>
             {t("how")}
           </Link>
-          <Link to="/" hash="centers" className="nav-link">
+          <Link to="/reserves" className="nav-link" activeProps={{ "data-status": "active" }}>
+            {t("reserves")}
+          </Link>
+          <Link to="/" hash="centers" className="nav-link" activeProps={{}}>
             {t("centers")}
           </Link>
-          <Link to="/" hash="compat" className="nav-link">
+          <Link to="/" hash="compat" className="nav-link" activeProps={{}}>
             {t("compatibility")}
           </Link>
         </nav>
@@ -58,10 +58,13 @@ export function SiteHeader() {
             </>
           ) : (
             <>
+              <Link to="/login" search={{ espace: "centre" }} className="nav-link">
+                {t("proSpace")}
+              </Link>
               <Link to="/login" className="nav-link">
                 {t("login")}
               </Link>
-              <Link to="/register" className="nav-link" style={{ fontWeight: 700 }}>
+              <Link to="/register" className="btn btn-primary btn-sm">
                 {t("register")}
               </Link>
             </>
@@ -85,6 +88,9 @@ export function SiteHeader() {
           <Link to="/" hash="how" onClick={() => setOpen(false)}>
             {t("how")}
           </Link>
+          <Link to="/reserves" onClick={() => setOpen(false)}>
+            {t("reserves")}
+          </Link>
           {session ? (
             <>
               <Link to={roleHome(session.role) as "/"} onClick={() => setOpen(false)}>
@@ -96,6 +102,9 @@ export function SiteHeader() {
             </>
           ) : (
             <>
+              <Link to="/login" search={{ espace: "centre" }} onClick={() => setOpen(false)}>
+                {t("proSpace")}
+              </Link>
               <Link to="/login" onClick={() => setOpen(false)}>
                 {t("login")}
               </Link>

@@ -102,7 +102,9 @@ function CenterRequestsPage() {
                     ))}
                   </select>
                   {errors.groupeSanguinDemande && (
-                    <span className="field-error">{errors.groupeSanguinDemande.message}</span>
+                    <span className="field-error">
+                      {t(errors.groupeSanguinDemande.message ?? "invalid")}
+                    </span>
                   )}
                 </div>
                 <div className="field">
@@ -114,7 +116,9 @@ function CenterRequestsPage() {
                     {...form.register("quantiteNecessaire")}
                   />
                   {errors.quantiteNecessaire && (
-                    <span className="field-error">{errors.quantiteNecessaire.message}</span>
+                    <span className="field-error">
+                      {t(errors.quantiteNecessaire.message ?? "invalid")}
+                    </span>
                   )}
                 </div>
                 <div className="field">
@@ -126,7 +130,9 @@ function CenterRequestsPage() {
                       </option>
                     ))}
                   </select>
-                  {errors.urgence && <span className="field-error">{errors.urgence.message}</span>}
+                  {errors.urgence && (
+                    <span className="field-error">{t(errors.urgence.message ?? "invalid")}</span>
+                  )}
                 </div>
                 <div className="field">
                   <label htmlFor="dateExpiration">{t("expiryDate")}</label>
@@ -136,7 +142,9 @@ function CenterRequestsPage() {
                     {...form.register("dateExpiration")}
                   />
                   {errors.dateExpiration && (
-                    <span className="field-error">{errors.dateExpiration.message}</span>
+                    <span className="field-error">
+                      {t(errors.dateExpiration.message ?? "invalid")}
+                    </span>
                   )}
                 </div>
               </div>

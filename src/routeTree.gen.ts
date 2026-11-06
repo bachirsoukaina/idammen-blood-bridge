@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ReservesRouteImport } from './routes/reserves'
 import { Route as CenterDashboardRouteImport } from './routes/center.dashboard'
 import { Route as CenterMapRouteImport } from './routes/center.map'
 import { Route as CenterRequestsRouteImport } from './routes/center.requests'
@@ -35,6 +36,11 @@ const LoginRoute = LoginRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReservesRoute = ReservesRouteImport.update({
+  id: '/reserves',
+  path: '/reserves',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CenterDashboardRoute = CenterDashboardRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reserves': typeof ReservesRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/center/map': typeof CenterMapRoute
   '/center/requests': typeof CenterRequestsRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reserves': typeof ReservesRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/center/map': typeof CenterMapRoute
   '/center/requests': typeof CenterRequestsRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/reserves': typeof ReservesRoute
   '/center/dashboard': typeof CenterDashboardRoute
   '/center/map': typeof CenterMapRoute
   '/center/requests': typeof CenterRequestsRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/reserves'
     | '/center/dashboard'
     | '/center/map'
     | '/center/requests'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/reserves'
     | '/center/dashboard'
     | '/center/map'
     | '/center/requests'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/register'
+    | '/reserves'
     | '/center/dashboard'
     | '/center/map'
     | '/center/requests'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  ReservesRoute: typeof ReservesRoute
   CenterDashboardRoute: typeof CenterDashboardRoute
   CenterMapRoute: typeof CenterMapRoute
   CenterRequestsRoute: typeof CenterRequestsRoute
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reserves': {
+      id: '/reserves'
+      path: '/reserves'
+      fullPath: '/reserves'
+      preLoaderRoute: typeof ReservesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/center/dashboard': {
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  ReservesRoute: ReservesRoute,
   CenterDashboardRoute: CenterDashboardRoute,
   CenterMapRoute: CenterMapRoute,
   CenterRequestsRoute: CenterRequestsRoute,

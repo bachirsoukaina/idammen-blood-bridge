@@ -225,12 +225,17 @@ function CenterDashboardPage() {
               <section className="surface">
                 <div className="surface-head">
                   <h2 className="surface-title">{t("toValidate")}</h2>
+                  {pending.length > 5 && (
+                    <Link to="/center/responses" search={{ request: 0 }} className="link-more">
+                      {t("seeAll")} ({pending.length}) <ArrowRight size={14} aria-hidden />
+                    </Link>
+                  )}
                 </div>
                 {pending.length === 0 ? (
                   <EmptyState>{t("nothingToValidate")}</EmptyState>
                 ) : (
                   <div className="row-list">
-                    {pending.map((p) => (
+                    {pending.slice(0, 5).map((p) => (
                       <div key={p.don.id} className="row-item">
                         <span className="row-main">
                           <span className="blood-badge">{p.donneur.groupeSanguin}</span>

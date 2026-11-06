@@ -6,6 +6,10 @@ const COLORS: Record<string, string> = {
   eligible: "#3a7d5c",
   ineligible: "#8a8a8a",
   center: "#b5332a",
+  ok: "#3a7d5c",
+  low: "#d9a441",
+  critical: "#b5332a",
+  me: "#1f3a5f",
 };
 
 export function MapInner({ center, zoom = 6, markers }: MapViewProps) {
@@ -24,7 +28,11 @@ export function MapInner({ center, zoom = 6, markers }: MapViewProps) {
         <CircleMarker
           key={`${m.label}-${i}`}
           center={[m.latitude, m.longitude]}
-          radius={8}
+          radius={
+            m.kind === "center" || m.kind === "ok" || m.kind === "low" || m.kind === "critical"
+              ? 10
+              : 7
+          }
           pathOptions={{
             color: "#fff",
             weight: 2,

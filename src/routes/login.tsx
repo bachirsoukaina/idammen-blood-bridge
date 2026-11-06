@@ -1,4 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Building2, HeartHandshake, ShieldCheck } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -29,6 +30,9 @@ export const Route = createFileRoute("/login")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  // ?espace=centre opens the center tab; without it the donor tab is shown.
+  validateSearch: (search: Record<string, unknown>): { espace?: "centre" } =>
+    search["espace"] === "centre" ? { espace: "centre" } : {},
   component: LoginPage,
 });
 
@@ -37,6 +41,8 @@ type LoginValues = { email: string; password: string };
 function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { espace } = Route.useSearch();
+  const isCenter = espace === "centre";
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -70,14 +76,46 @@ function LoginPage() {
   return (
     <>
       <SiteHeader />
-      <AuthLayout title={t("welcome")} description={t("loginDescription")}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>{t("login")}</h1>
+      <AuthLayout
+        title={isCenter ? t("proSpaceTitle") : t("welcome")}
+        description={isCenter ? t("proSpaceDescription") : t("loginDescription")}
+      >
+        <div className="segmented" role="tablist" aria-label={t("login")}>
+          <Link to="/login" search={{}} role="tab" aria-selected={!isCenter} activeProps={{}}>
+            <HeartHandshake size={16} aria-hidden /> {t("donorRole")}
+          </Link>
+          <Link
+            to="/login"
+            search={{ espace: "centre" }}
+            role="tab"
+            aria-selected={isCenter}
+            activeProps={{}}
+          >
+            <Building2 size={16} aria-hidden /> {t("centerRole")}
+          </Link>
+        </div>
+
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: "22px 0 4px" }}>
+          {isCenter ? t("proLogin") : t("login")}
+        </h1>
+        <p style={{ margin: 0, fontSize: 13, color: "var(--muted-foreground)" }}>
+          {isCenter ? t("proLoginHint") : t("donorLoginHint")}
+        </p>
+
         <form onSubmit={onSubmit} noValidate style={{ display: "grid", gap: 16, marginTop: 20 }}>
           <div className="field">
-            <label htmlFor="email">{t("email")}</label>
-            <input id="email" type="email" autoComplete="email" {...form.register("email")} />
+            <label htmlFor="email">{isCenter ? t("proEmail") : t("email")}</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder={isCenter ? "crts.casablanca@sante.gov.ma" : "prenom.nom@exemple.ma"}
+              {...form.register("email")}
+            />
             {form.formState.errors.email && (
-              <span className="field-error">{form.formState.errors.email.message}</span>
+              <span className="field-error">
+                {t(form.formState.errors.email.message ?? "invalid")}
+              </span>
             )}
           </div>
           <div className="field">
@@ -89,68 +127,54 @@ function LoginPage() {
               {...form.register("password")}
             />
             {form.formState.errors.password && (
-              <span className="field-error">{form.formState.errors.password.message}</span>
+              <span className="field-error">
+                {t(form.formState.errors.password.message ?? "invalid")}
+              </span>
             )}
           </div>
           <button
             type="submit"
+            className="btn btn-primary"
+            style={{ height: 46 }}
             disabled={form.formState.isSubmitting}
-            style={{
-              background: "var(--primary)",
-              color: "var(--primary-foreground)",
-              border: 0,
-              borderRadius: 6,
-              padding: "12px 18px",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
           >
             {t("login")}
           </button>
         </form>
-        <p style={{ marginTop: 18, fontSize: 12, color: "var(--muted-foreground)" }}>
-          {t("noAccount")}{" "}
-          <a href="/register" style={{ color: "var(--primary)", fontWeight: 700 }}>
-            {t("register")}
-          </a>
-        </p>
+
+        {isCenter ? (
+          <p className="auth-note">
+            <ShieldCheck size={16} aria-hidden /> {t("proAccountNote")}
+          </p>
+        ) : (
+          <p style={{ marginTop: 18, fontSize: 13, color: "var(--muted-foreground)" }}>
+            {t("noAccount")}{" "}
+            <Link to="/register" style={{ color: "var(--primary)", fontWeight: 700 }}>
+              {t("register")}
+            </Link>
+          </p>
+        )}
+
         {/* Demo accounts only exist in mock mode (VITE_USE_MOCK is not "false"). */}
         {useMock && (
-          <div style={{ marginTop: 26, borderTop: "1px solid var(--border)", paddingTop: 20 }}>
+          <div style={{ marginTop: 24, borderTop: "1px solid var(--border)", paddingTop: 18 }}>
             <span className="eyebrow">{t("demoLogin")}</span>
-            <div className="auth-tabs">
-              <button
-                type="button"
-                onClick={() => demo("DONNEUR")}
-                style={{
-                  border: "1px solid var(--border)",
-                  background: "var(--card)",
-                  borderRadius: 6,
-                  padding: 10,
-                  fontWeight: 700,
-                  color: "var(--primary)",
-                  cursor: "pointer",
-                }}
-              >
-                {t("donorRole")}
-              </button>
-              <button
-                type="button"
-                onClick={() => demo("CENTRE")}
-                style={{
-                  border: "1px solid var(--border)",
-                  background: "var(--card)",
-                  borderRadius: 6,
-                  padding: 10,
-                  fontWeight: 700,
-                  color: "var(--primary)",
-                  cursor: "pointer",
-                }}
-              >
-                {t("centerRole")}
-              </button>
-            </div>
-            <small style={{ color: "var(--muted-foreground)", fontSize: 10 }}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              style={{ width: "100%", marginTop: 12 }}
+              onClick={() => demo(isCenter ? "CENTRE" : "DONNEUR")}
+            >
+              {isCenter ? t("demoCenter") : t("demoDonor")}
+            </button>
+            <small
+              style={{
+                display: "block",
+                marginTop: 8,
+                color: "var(--muted-foreground)",
+                fontSize: 11,
+              }}
+            >
               {t("demoHint")}
             </small>
           </div>
