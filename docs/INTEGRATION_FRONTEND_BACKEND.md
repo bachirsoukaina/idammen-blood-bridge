@@ -105,17 +105,17 @@ Réponse attendue : `200` ou `201` avec `{ "token": "<JWT rôle DONNEUR>" }`. Le
 
 Règles déjà vérifiées par le front (le backend doit **les revérifier**, le front n'est jamais une barrière de sécurité) :
 
-| Champ                   | Règle                                                                            |
-| ----------------------- | -------------------------------------------------------------------------------- |
-| `nom`                   | 2 à 100 caractères                                                               |
-| `email`                 | e-mail valide, 255 caractères max                                                |
-| `telephone`             | mobile marocain : `+212 6…`, `+212 7…`, `06…` ou `07…` (regex : `^(?:\+212[\s-]? | 0)[67](?:[\s-]?\d){8}$`) |
-| `password`              | 8 à 128 caractères                                                               |
-| `groupeSanguin`         | `A+`, `A-`, `B+`, `B-`, `AB+`, `AB-`, `O+`, `O-`                                 |
-| `sexe`                  | `M` ou `F` (nécessaire au calcul de l'éligibilité)                               |
-| `dateNaissance`         | `YYYY-MM-DD`, âge entre 18 et 65 ans (valeur de référence à confirmer)           |
-| `poids`                 | 50 kg minimum (valeur de référence à confirmer)                                  |
-| `latitude`, `longitude` | coordonnées de la ville choisie dans la liste                                    |
+| Champ                   | Règle                                                                                                      |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `nom`                   | 2 à 100 caractères                                                                                         |
+| `email`                 | e-mail valide, 255 caractères max                                                                          |
+| `telephone`             | mobile marocain : `+212 6…`, `+212 7…`, `06…` ou `07…` (regex : `^(?:\+212[\s-]?\|0)[67](?:[\s-]?\d){8}$`) |
+| `password`              | 8 à 128 caractères                                                                                         |
+| `groupeSanguin`         | `A+`, `A-`, `B+`, `B-`, `AB+`, `AB-`, `O+`, `O-`                                                           |
+| `sexe`                  | `M` ou `F` (nécessaire au calcul de l'éligibilité)                                                         |
+| `dateNaissance`         | `YYYY-MM-DD`, âge entre 18 et 65 ans (valeur de référence à confirmer)                                     |
+| `poids`                 | 50 kg minimum (valeur de référence à confirmer)                                                            |
+| `latitude`, `longitude` | coordonnées de la ville choisie dans la liste                                                              |
 
 Erreurs : e-mail déjà utilisé → `409` ; données invalides → `400`. Le front affiche aujourd'hui un message générique dans les deux cas.
 
