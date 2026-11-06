@@ -7,13 +7,13 @@ npm run seed          # 600 donneurs
 npm run seed -- 2000  # entre 500 et 2000 donneurs
 ```
 
-| Fichier | Pour | Contenu |
-|---|---|---|
-| `src/api/seed-data.json` | Mode mock du frontend | Tout, dans le format de l'API |
-| `seed/sql/donor-service.sql` | Base du donor-service | Table `donneur` |
-| `seed/sql/center-service.sql` | Base du center-service | Tables `centre`, `stock_sang` |
+| Fichier                        | Pour                    | Contenu                                  |
+| ------------------------------ | ----------------------- | ---------------------------------------- |
+| `src/api/seed-data.json`       | Mode mock du frontend   | Tout, dans le format de l'API            |
+| `seed/sql/donor-service.sql`   | Base du donor-service   | Table `donneur`                          |
+| `seed/sql/center-service.sql`  | Base du center-service  | Tables `centre`, `stock_sang`            |
 | `seed/sql/request-service.sql` | Base du request-service | Tables `demande_don`, `don` (historique) |
-| `seed/sql/loyalty-service.sql` | Base du loyalty-service | Table `points_donneur` |
+| `seed/sql/loyalty-service.sql` | Base du loyalty-service | Table `points_donneur`                   |
 
 ## Ce qui est généré
 
