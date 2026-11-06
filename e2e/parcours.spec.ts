@@ -26,11 +26,9 @@ async function loginAsCenter(page: Page) {
 
 /** Quantité affichée pour un groupe dans « Niveaux de stock » du tableau de bord. */
 async function dashboardStock(page: Page, group: string) {
-  const row = page
-    .locator(".level-row")
-    .filter({
-      has: page.locator(".blood-badge", { hasText: new RegExp(`^${group.replace("+", "\\+")}$`) }),
-    });
+  const row = page.locator(".level-row").filter({
+    has: page.locator(".blood-badge", { hasText: new RegExp(`^${group.replace("+", "\\+")}$`) }),
+  });
   const text = await row.locator(".level-meta strong").innerText();
   return Number(text);
 }
