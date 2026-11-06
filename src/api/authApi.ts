@@ -10,7 +10,12 @@ export const authApi = {
     const data = loginSchema.parse(input);
     return useMock
       ? mockResult(() => ({
-          token: mockToken(data.email === "centre@example.ma" ? "CENTRE" : "DONNEUR"),
+          token: mockToken(
+            // Mock only: staff addresses open the center portal; the real role comes from the backend.
+            data.email === "centre@example.ma" || data.email.endsWith("@sante.gov.ma")
+              ? "CENTRE"
+              : "DONNEUR",
+          ),
         }))
       : http<{ token: string }>("/auth/login", "POST", data);
   },

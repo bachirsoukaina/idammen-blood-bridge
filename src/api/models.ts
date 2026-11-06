@@ -12,6 +12,9 @@ export interface Donneur {
   longitude: number;
   dateDernierDon: string | null;
   statutEligibilite: string;
+  /** "M" ou "F" : le délai entre deux dons en dépend. */
+  sexe?: string;
+  ville?: string;
 }
 export interface Centre {
   id: number;
@@ -20,6 +23,8 @@ export interface Centre {
   latitude: number;
   longitude: number;
   telephone: string;
+  ville?: string;
+  region?: string;
 }
 export interface StockSang {
   id: number;
@@ -61,6 +66,17 @@ export interface PointsDonneur {
   prochainNiveau?: string;
   pointsProchainNiveau?: number;
 }
+/** Niveau des réserves d'un groupe sanguin, pour la page publique (sans donnée personnelle). */
+export interface ReserveGroupe {
+  groupeSanguin: string;
+  quantitePoches: number;
+  seuilAlerte: number;
+}
+/** Réserves d'un centre, pour la page publique et la carte des centres. */
+export interface ReserveCentre {
+  centre: Centre;
+  stock: ReserveGroupe[];
+}
 export interface Recompense {
   id: number;
   nom: string;
@@ -94,4 +110,6 @@ export const cities = [
   { key: "Fes", latitude: 34.0331, longitude: -5.0003 },
   { key: "Tanger", latitude: 35.7595, longitude: -5.834 },
   { key: "Agadir", latitude: 30.4278, longitude: -9.5981 },
+  { key: "Oujda", latitude: 34.6814, longitude: -1.9086 },
+  { key: "Meknes", latitude: 33.8935, longitude: -5.5473 },
 ];

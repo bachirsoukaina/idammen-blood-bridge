@@ -1,7 +1,13 @@
 import { http, useMock, mockResult } from "./client";
-import { mockDb, requireMockRole } from "./mock";
+import {
+  mockDb,
+  mockMonthlyDonations,
+  mockNearbyDonors,
+  mockReserves,
+  requireMockRole,
+} from "./mock";
 import { stockSchema } from "./validation";
-import type { Centre, StockSang, Donneur } from "./models";
+import type { Centre, StockSang, Donneur, ReserveCentre } from "./models";
 export interface CenterStats {
   monthly: { month: number; dons: number }[];
   stock: StockSang[];
@@ -36,20 +42,16 @@ export const centerApi = {
   },
   nearby: () =>
     useMock
-      ? mockResult(() => mockDb.responses.map((r) => r.donneur))
+      ? mockResult(() => mockNearbyDonors())
       : http<Donneur[]>("/api/centers/me/nearby-donors"),
   stats: () =>
     useMock
       ? mockResult(() => ({
-          monthly: [
-            { month: 4, dons: 84 },
-            { month: 5, dons: 112 },
-            { month: 6, dons: 96 },
-            { month: 7, dons: 143 },
-            { month: 8, dons: 126 },
-            { month: 9, dons: 158 },
-          ],
+          monthly: mockMonthlyDonations(),
           stock: mockDb.stock,
         }))
       : http<CenterStats>("/api/centers/me/stats"),
+  /** Public, sans connexion : réserves par centre et par groupe, sans donnée personnelle. */
+  reserves: () =>
+    useMock ? mockResult(() => mockReserves()) : http<ReserveCentre[]>("/api/public/reserves"),
 };

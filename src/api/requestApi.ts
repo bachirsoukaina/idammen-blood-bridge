@@ -8,7 +8,7 @@ export const requestApi = {
     useMock
       ? mockResult(() => {
           requireMockRole("CENTRE");
-          return mockDb.requests;
+          return mockDb.requests.filter((r) => r.centreId === mockDb.center.id);
         })
       : http<DemandeDon[]>("/api/requests"),
   create: (input: unknown) => {
@@ -19,7 +19,7 @@ export const requestApi = {
           const request = {
             ...data,
             id: Date.now(),
-            centreId: 1,
+            centreId: mockDb.center.id,
             statut: "ACTIVE",
             dateCreation: new Date().toISOString(),
             centre: mockDb.center,
