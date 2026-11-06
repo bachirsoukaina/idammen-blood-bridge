@@ -243,7 +243,20 @@ export function validateMockDonation(id: number) {
   // Le donneur ne redevient éligible qu'après le délai légal.
   row.donneur.dateDernierDon = new Date().toISOString().slice(0, 10);
   row.donneur.statutEligibilite = "NON_ELIGIBLE";
+  // Comme le loyalty-service sur l'événement don-valide : points crédités, niveau recalculé.
+  if (row.donneur.id === mockDb.donor.id) creditMockPoints();
   return row.don;
+}
+
+/** Points gagnés par don validé (valeur de référence à confirmer). */
+export const POINTS_PER_DONATION = 100;
+
+function creditMockPoints() {
+  mockDb.points.pointsActuels += POINTS_PER_DONATION;
+  mockDb.points.nombreDonsTotal += 1;
+  mockDb.pointsCumules += POINTS_PER_DONATION;
+  const level = [...mockDb.levels].reverse().find((l) => mockDb.pointsCumules >= l.min);
+  if (level) mockDb.points.niveau = level.niveau;
 }
 
 export function exchangeMockReward(id: number) {

@@ -43,13 +43,15 @@ Comptes de démonstration (mode mock) : toute adresse e-mail avec un mot de pass
 
 ## Commandes
 
-| Commande          | Rôle                                                    |
-| ----------------- | ------------------------------------------------------- |
-| `npm run dev`     | Serveur de développement                                |
-| `npm run build`   | Vérification TypeScript puis site statique dans `dist/` |
-| `npm run preview` | Sert `dist/` en local (port 4173)                       |
-| `npm test`        | Tests automatiques                                      |
-| `npm run lint`    | ESLint + Prettier                                       |
+| Commande          | Rôle                                                                                               |
+| ----------------- | -------------------------------------------------------------------------------------------------- |
+| `npm run dev`     | Serveur de développement                                                                           |
+| `npm run build`   | Vérification TypeScript puis site statique dans `dist/`                                            |
+| `npm run preview` | Sert `dist/` en local (port 4173)                                                                  |
+| `npm test`        | Tests automatiques                                                                                 |
+| `npm run lint`    | ESLint + Prettier                                                                                  |
+| `npm run e2e`     | Tests de bout en bout Playwright, en mode mock (première fois : `npx playwright install chromium`) |
+| `npm run seed`    | Régénère les données de test (`seed/README.md`)                                                    |
 
 ## Docker (SCRUM-98)
 

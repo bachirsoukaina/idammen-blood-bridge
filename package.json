@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "seed": "node scripts/generate-seed.mjs"
+    "seed": "node scripts/generate-seed.mjs",
+    "e2e": "playwright test"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -77,6 +78,7 @@
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@faker-js/faker": "^10.6.0",
+    "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",

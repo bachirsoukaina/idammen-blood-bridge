@@ -90,7 +90,10 @@ function DonorLoyaltyPage() {
           <section style={{ ...card, display: "grid", gap: 14 }}>
             <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontSize: 34, fontWeight: 900, color: "var(--primary)" }}>
+                <div
+                  data-testid="points-balance"
+                  style={{ fontSize: 34, fontWeight: 900, color: "var(--primary)" }}
+                >
                   {points.pointsActuels}
                 </div>
                 <div style={{ fontSize: 13, color: "var(--muted-foreground)" }}>{t("points")}</div>
