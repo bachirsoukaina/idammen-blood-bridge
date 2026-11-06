@@ -136,6 +136,7 @@ test("inscription d'un nouveau donneur", async ({ page }) => {
   await page.getByLabel("Téléphone").fill("+212 661 23 45 67");
   await page.getByLabel("Mot de passe").fill("motdepasse2026");
   await page.getByLabel("Groupe sanguin").selectOption("A-");
+  await page.getByLabel("Sexe").selectOption("F");
   await page.getByLabel("Date de naissance").fill("1998-03-21");
   await page.getByLabel("Poids (kg)").fill("58");
   await page.getByRole("button", { name: "Créer mon compte" }).click();

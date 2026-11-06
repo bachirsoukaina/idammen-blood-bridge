@@ -30,6 +30,7 @@ type ProfileValues = {
   email: string;
   telephone: string;
   groupeSanguin: string;
+  sexe: string;
   dateNaissance: string;
   poids: string;
   latitude: string;
@@ -42,6 +43,7 @@ function toValues(d: Donneur): ProfileValues {
     email: d.email,
     telephone: d.telephone,
     groupeSanguin: d.groupeSanguin,
+    sexe: d.sexe ?? "",
     dateNaissance: d.dateNaissance.slice(0, 10),
     poids: String(d.poids),
     latitude: String(d.latitude),
@@ -167,6 +169,17 @@ function DonorProfilePage() {
                     <span className="field-error">
                       {t(errors.groupeSanguin.message ?? "invalid")}
                     </span>
+                  )}
+                </div>
+                <div className="field">
+                  <label htmlFor="sexe">{t("sex")}</label>
+                  <select id="sexe" {...form.register("sexe")}>
+                    <option value="">—</option>
+                    <option value="M">{t("sexM")}</option>
+                    <option value="F">{t("sexF")}</option>
+                  </select>
+                  {errors.sexe && (
+                    <span className="field-error">{t(errors.sexe.message ?? "invalid")}</span>
                   )}
                 </div>
                 <div className="field">

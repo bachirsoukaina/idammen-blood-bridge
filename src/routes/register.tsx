@@ -38,6 +38,7 @@ type RegisterValues = {
   telephone: string;
   password: string;
   groupeSanguin: string;
+  sexe: string;
   dateNaissance: string;
   poids: string;
   latitude: string;
@@ -57,6 +58,7 @@ function RegisterPage() {
       telephone: "",
       password: "",
       groupeSanguin: "",
+      sexe: "",
       dateNaissance: "",
       poids: "",
       latitude: String(cities[0]?.latitude ?? ""),
@@ -123,6 +125,17 @@ function RegisterPage() {
               />
               {errors.password && (
                 <span className="field-error">{t(errors.password.message ?? "invalid")}</span>
+              )}
+            </div>
+            <div className="field">
+              <label htmlFor="sexe">{t("sex")}</label>
+              <select id="sexe" {...form.register("sexe")}>
+                <option value="">—</option>
+                <option value="M">{t("sexM")}</option>
+                <option value="F">{t("sexF")}</option>
+              </select>
+              {errors.sexe && (
+                <span className="field-error">{t(errors.sexe.message ?? "invalid")}</span>
               )}
             </div>
             <div className="field">

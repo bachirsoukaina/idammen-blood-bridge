@@ -25,6 +25,8 @@ export const profileSchema = z.object({
   email: z.string().trim().email("invalidEmail").max(255),
   telephone: phone,
   groupeSanguin: z.enum(bloodGroups, { errorMap: () => ({ message: "invalid" }) }),
+  // Le délai entre deux dons dépend du sexe (environ 2 mois pour un homme, 3 pour une femme).
+  sexe: z.enum(["M", "F"], { errorMap: () => ({ message: "required" }) }),
   dateNaissance: z.string().refine(isValidDonorBirthDate, "invalid"),
   poids: z.coerce.number().min(50, "invalid").max(500, "invalid"),
   latitude: z.coerce.number().min(-90).max(90),

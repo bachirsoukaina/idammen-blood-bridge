@@ -321,5 +321,8 @@
   "pointsCost_two": "{{count}} نقطة",
   "pointsCost_few": "{{count}} نقطة",
   "pointsCost_many": "{{count}} نقطة",
-  "pointsCost_other": "{{count}} نقطة"
+  "pointsCost_other": "{{count}} نقطة",
+  "sex": "الجنس",
+  "sexM": "ذكر",
+  "sexF": "أنثى"
 }

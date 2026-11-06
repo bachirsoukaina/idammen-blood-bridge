@@ -283,5 +283,8 @@
   "backHome": "Retour à l'accueil",
   "errorPageTitle": "Cette page n'a pas pu se charger",
   "errorPageText": "Une erreur est survenue. Vous pouvez réessayer ou retourner à l'accueil.",
-  "mainNav": "Navigation principale"
+  "mainNav": "Navigation principale",
+  "sex": "Sexe",
+  "sexM": "Homme",
+  "sexF": "Femme"
 }
