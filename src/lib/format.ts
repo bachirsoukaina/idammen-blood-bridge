@@ -23,3 +23,11 @@ export function formatDateTime(value?: string | null) {
     minute: "2-digit",
   });
 }
+
+/**
+ * Keeps a left-to-right token (blood group "O+", code, number) readable inside
+ * right-to-left text: without it, Arabic shows "O+" as "+O".
+ */
+export function ltr(value: string) {
+  return `⁦${value}⁩`;
+}

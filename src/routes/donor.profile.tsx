@@ -12,6 +12,9 @@ import { errorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import { RoleGuard } from "@/components/role-guard";
 import { AppShell, PageError, PageLoading } from "@/components/app-shell";
+import { DonorCard } from "@/components/donor/donor-card";
+import { EligibilityPanel } from "@/components/donor/eligibility-panel";
+import { NearbyCenters } from "@/components/donor/nearby-centers";
 
 export const Route = createFileRoute("/donor/profile")({
   head: () => ({ meta: [{ title: "Mon profil — Idammen" }] }),
@@ -58,6 +61,7 @@ function DonorProfilePage() {
   const [state, setState] = useState<"loading" | "error" | "ready">("loading");
   const [error, setError] = useState("");
   const [eligibility, setEligibility] = useState<Eligibility | null>(null);
+  const [donor, setDonor] = useState<Donneur | null>(null);
   const [donations, setDonations] = useState<Don[]>([]);
 
   const form = useForm<ProfileValues>({
@@ -74,6 +78,7 @@ function DonorProfilePage() {
         donorApi.donations(),
       ]);
       form.reset(toValues(donor));
+      setDonor(donor);
       setEligibility(elig);
       setDonations(list);
       setState("ready");
@@ -92,6 +97,7 @@ function DonorProfilePage() {
     try {
       const updated = await donorApi.update(values);
       form.reset(toValues(updated));
+      setDonor(updated);
       toast.success(t("profileSaved", "Profil mis à jour"));
     } catch (e) {
       toast.error(errorMessage(e, t));
@@ -99,39 +105,26 @@ function DonorProfilePage() {
   });
 
   return (
-    <AppShell space="donor" title={t("profile")}>
+    <AppShell
+      space="donor"
+      title={donor ? t("helloDonor", { name: donor.nom.split(" ")[0] }) : t("profile")}
+      intro={t("donorIntro")}
+    >
       {state === "loading" && <PageLoading />}
 
       {state === "error" && <PageError message={error} onRetry={() => void load()} />}
 
       {state === "ready" && eligibility && (
         <>
-          {/* Badge d'éligibilité */}
-          <section
-            style={{ ...card, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}
-          >
-            <span
-              style={{
-                background: eligibility.eligible ? "#2e7d5b" : "#d9a441",
-                color: "#fff",
-                borderRadius: 999,
-                padding: "6px 16px",
-                fontWeight: 800,
-                fontSize: 14,
-              }}
-            >
-              {eligibility.eligible ? t("eligible", "Éligible") : t("notEligible", "Non éligible")}
-            </span>
-            <span style={{ fontSize: 14 }}>
-              {eligibility.eligible
-                ? t("eligibleSince", "Vous pouvez donner depuis le {{date}}", {
-                    date: formatDate(eligibility.dateEligibilite),
-                  })
-                : t("eligibleOn", "Vous redevenez éligible le {{date}}", {
-                    date: formatDate(eligibility.dateEligibilite),
-                  })}
-            </span>
-          </section>
+          {donor && (
+            <>
+              <div className="donor-top">
+                <DonorCard donor={donor} />
+                <EligibilityPanel donor={donor} eligibility={eligibility} donations={donations} />
+              </div>
+              <NearbyCenters donor={donor} />
+            </>
+          )}
 
           {/* Formulaire de profil */}
           <section style={card}>
@@ -245,43 +238,32 @@ function DonorProfilePage() {
               </p>
             ) : (
               <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                <table className="data-table">
                   <thead>
-                    <tr
-                      style={{
-                        textAlign: "start",
-                        borderBottom: "2px solid var(--border, #e5e0df)",
-                      }}
-                    >
-                      <th style={{ padding: 8 }}>{t("date", "Date")}</th>
-                      <th style={{ padding: 8 }}>{t("center", "Centre")}</th>
-                      <th style={{ padding: 8 }}>{t("quantity", "Quantité")}</th>
-                      <th style={{ padding: 8 }}>{t("status", "Statut")}</th>
+                    <tr>
+                      <th>{t("date")}</th>
+                      <th>{t("center")}</th>
+                      <th>{t("quantity")}</th>
+                      <th>{t("status")}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {donations.map((d) => (
-                      <tr key={d.id} style={{ borderBottom: "1px solid var(--border, #eee)" }}>
-                        <td style={{ padding: 8 }}>{formatDate(d.datePrelevement)}</td>
-                        <td style={{ padding: 8 }}>{d.centre?.nom ?? `#${d.centreId}`}</td>
-                        <td style={{ padding: 8 }}>{d.quantite}</td>
-                        <td style={{ padding: 8 }}>
-                          <span
-                            style={{
-                              color:
-                                d.statut === "VALIDE"
-                                  ? "#2e7d5b"
-                                  : d.statut === "ANNULE"
-                                    ? "var(--primary)"
-                                    : "#9a7316",
-                              fontWeight: 700,
-                            }}
-                          >
-                            {d.statut}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {[...donations]
+                      .sort((a, b) => b.datePrelevement.localeCompare(a.datePrelevement))
+                      .map((d) => (
+                        <tr key={d.id}>
+                          <td>{formatDate(d.datePrelevement)}</td>
+                          <td>{d.centre?.nom ?? `#${d.centreId}`}</td>
+                          <td>{t("bags", { count: d.quantite })}</td>
+                          <td>
+                            <span
+                              className={`status ${d.statut === "VALIDE" ? "good" : d.statut === "ANNULE" ? "" : "warn"}`}
+                            >
+                              {t(d.statut)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>

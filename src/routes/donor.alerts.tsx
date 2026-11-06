@@ -5,11 +5,14 @@ import { toast } from "sonner";
 
 import { donorApi } from "@/api/donorApi";
 import { requestApi } from "@/api/requestApi";
-import type { DemandeDon } from "@/api/models";
+import type { DemandeDon, Donneur } from "@/api/models";
 import { errorMessage } from "@/lib/errors";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, ltr } from "@/lib/format";
 import { RoleGuard } from "@/components/role-guard";
-import { AppShell, PageError, PageLoading } from "@/components/app-shell";
+import { AppShell, EmptyState, PageError, PageLoading } from "@/components/app-shell";
+import { Clock, Droplets, HeartHandshake, MapPin } from "lucide-react";
+import { distanceKm } from "@/lib/geo";
+import { urgenceStatusClass } from "@/lib/stock";
 
 export const Route = createFileRoute("/donor/alerts")({
   head: () => ({ meta: [{ title: "Mes alertes — Idammen" }] }),
@@ -20,12 +23,6 @@ export const Route = createFileRoute("/donor/alerts")({
   ),
 });
 
-const urgenceColor: Record<string, string> = {
-  CRITIQUE: "#c0392b",
-  URGENTE: "#d9a441",
-  NORMALE: "#1f3a5f",
-};
-
 function isExpired(r: DemandeDon) {
   return r.statut === "EXPIREE" || new Date(r.dateExpiration).getTime() < Date.now();
 }
@@ -35,12 +32,15 @@ function DonorAlertsPage() {
   const [state, setState] = useState<"loading" | "error" | "ready">("loading");
   const [error, setError] = useState("");
   const [alerts, setAlerts] = useState<DemandeDon[]>([]);
+  const [donor, setDonor] = useState<Donneur | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     setState("loading");
     try {
-      setAlerts(await donorApi.alerts());
+      const [list, me] = await Promise.all([donorApi.alerts(), donorApi.me()]);
+      setAlerts(list);
+      setDonor(me);
       setState("ready");
     } catch (e) {
       setError(errorMessage(e, t));
@@ -73,117 +73,92 @@ function DonorAlertsPage() {
   }
 
   return (
-    <AppShell space="donor" title={t("alerts")}>
+    <AppShell space="donor" title={t("alerts")} intro={t("alertsIntro")}>
       {state === "loading" && <PageLoading />}
 
       {state === "error" && <PageError message={error} onRetry={() => void load()} />}
 
-      {state === "ready" && alerts.length === 0 && (
-        <p style={{ color: "var(--muted-foreground)" }}>
-          {t(
-            "noAlerts",
-            "Aucune alerte pour le moment. Vous serez notifié si une demande urgente vous concerne.",
-          )}
-        </p>
-      )}
+      {state === "ready" && alerts.length === 0 && <EmptyState>{t("noAlerts")}</EmptyState>}
 
       {state === "ready" &&
         alerts.map((a) => {
           const expired = isExpired(a);
           const answered = Boolean(a.reponse);
+          const hoursLeft = Math.max(
+            0,
+            Math.round((new Date(a.dateExpiration).getTime() - Date.now()) / 3600e3),
+          );
+          const km = donor && a.centre ? distanceKm(donor, a.centre) : null;
           return (
             <article
               key={a.id}
-              style={{
-                background: "#fff",
-                border: "1px solid var(--border, #e5e0df)",
-                borderInlineStart: `5px solid ${urgenceColor[a.urgence] ?? "#999"}`,
-                borderRadius: 10,
-                padding: 18,
-                display: "grid",
-                gap: 10,
-                opacity: expired ? 0.65 : 1,
-              }}
+              className={`alert-card urgency-${a.urgence.toLowerCase()}`}
+              style={{ opacity: expired ? 0.6 : 1 }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 8,
-                  flexWrap: "wrap",
-                }}
-              >
-                <strong style={{ fontSize: 17 }}>{a.centre?.nom ?? `#${a.centreId}`}</strong>
-                <span
-                  style={{
-                    color: urgenceColor[a.urgence] ?? "#999",
-                    fontWeight: 800,
-                    fontSize: 13,
-                  }}
-                >
-                  {a.urgence}
+              <div className="alert-card-head">
+                <span className="blood-badge" style={{ fontSize: 18, padding: "8px 12px" }}>
+                  {a.groupeSanguinDemande}
                 </span>
-              </div>
-              <div style={{ display: "flex", gap: 20, flexWrap: "wrap", fontSize: 14 }}>
-                <span>
-                  {t("bloodGroup")} : <strong>{a.groupeSanguinDemande}</strong>
-                </span>
-                <span>
-                  {t("quantity", "Quantité")} : <strong>{a.quantiteNecessaire}</strong>
-                </span>
-                <span>
-                  {t("expiresOn", "Expire le")} :{" "}
-                  <strong>{formatDateTime(a.dateExpiration)}</strong>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <strong className="alert-card-title">{a.centre?.nom ?? `#${a.centreId}`}</strong>
+                  <small>
+                    <MapPin size={12} aria-hidden /> {a.centre?.adresse}
+                    {km !== null && (
+                      <> · {t("kmAway", { km: km < 10 ? km.toFixed(1) : Math.round(km) })}</>
+                    )}
+                  </small>
+                </div>
+                <span className={`status ${urgenceStatusClass[a.urgence] ?? ""}`}>
+                  {t(a.urgence)}
                 </span>
               </div>
 
-              {expired ? (
-                <p style={{ fontSize: 14, fontWeight: 700 }}>{t("expired", "Demande expirée")}</p>
-              ) : answered ? (
+              <ul className="alert-facts">
+                <li>
+                  <Droplets size={15} aria-hidden />{" "}
+                  {t("bagsNeeded", { count: a.quantiteNecessaire })}
+                </li>
+                <li>
+                  <Clock size={15} aria-hidden />{" "}
+                  {expired
+                    ? t("expired")
+                    : t("hoursLeft", { count: hoursLeft, date: formatDateTime(a.dateExpiration) })}
+                </li>
+                {donor && (
+                  <li>
+                    <HeartHandshake size={15} aria-hidden />{" "}
+                    {t("compatibleBecause", {
+                      mine: ltr(donor.groupeSanguin),
+                      needed: ltr(a.groupeSanguinDemande),
+                    })}
+                  </li>
+                )}
+              </ul>
+
+              {expired ? null : answered ? (
                 <p
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: a.reponse === "CONFIRME" ? "#2e7d5b" : "var(--muted-foreground)",
-                  }}
+                  className={`status ${a.reponse === "CONFIRME" ? "good" : "muted"}`}
+                  style={{ justifySelf: "start", margin: 0 }}
                 >
-                  {a.reponse === "CONFIRME"
-                    ? t("youConfirmed", "Vous avez confirmé votre disponibilité")
-                    : t("youDeclined", "Vous avez décliné")}
+                  {a.reponse === "CONFIRME" ? t("youConfirmed") : t("youDeclined")}
                 </p>
               ) : (
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                   <button
                     type="button"
+                    className="btn btn-success"
                     disabled={busyId === a.id}
                     onClick={() => void answer(a.id, "CONFIRME")}
-                    style={{
-                      background: "#2e7d5b",
-                      color: "#fff",
-                      border: 0,
-                      borderRadius: 6,
-                      padding: "10px 16px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
                   >
-                    {t("available", "Je suis disponible")}
+                    {t("available")}
                   </button>
                   <button
                     type="button"
+                    className="btn btn-outline"
                     disabled={busyId === a.id}
                     onClick={() => void answer(a.id, "DECLINE")}
-                    style={{
-                      background: "#fff",
-                      color: "var(--primary)",
-                      border: "1px solid var(--primary)",
-                      borderRadius: 6,
-                      padding: "10px 16px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
                   >
-                    {t("decline", "Je décline")}
+                    {t("decline")}
                   </button>
                 </div>
               )}

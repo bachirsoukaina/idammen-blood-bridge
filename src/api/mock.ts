@@ -14,6 +14,7 @@ import type {
   StockSang,
 } from "./models";
 import { decodeToken, readToken } from "./session";
+import { distanceKm } from "@/lib/geo";
 
 const DAY = 24 * 3600 * 1000;
 const HOUR = 3600 * 1000;
@@ -38,20 +39,6 @@ export function nextEligibleDate(d: Pick<Donneur, "dateDernierDon" | "sexe">): D
   if (!d.dateDernierDon) return new Date(0);
   const gap = MIN_DAYS_BETWEEN_DONATIONS[d.sexe ?? "M"] ?? 60;
   return new Date(new Date(d.dateDernierDon).getTime() + gap * DAY);
-}
-
-/** Distance à vol d'oiseau en kilomètres. */
-export function distanceKm(
-  a: { latitude: number; longitude: number },
-  b: { latitude: number; longitude: number },
-) {
-  const rad = Math.PI / 180;
-  const dLat = (b.latitude - a.latitude) * rad;
-  const dLng = (b.longitude - a.longitude) * rad;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(a.latitude * rad) * Math.cos(b.latitude * rad) * Math.sin(dLng / 2) ** 2;
-  return 6371 * 2 * Math.asin(Math.sqrt(h));
 }
 
 const now = Date.now();

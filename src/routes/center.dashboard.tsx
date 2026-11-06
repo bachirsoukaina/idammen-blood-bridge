@@ -117,10 +117,12 @@ function CenterDashboardPage() {
           {below.some((s) => stockLevel(s) === "critical") && (
             <div className="alert-banner" role="status">
               <strong>{t("criticalAlert")}</strong>{" "}
-              {below
-                .filter((s) => stockLevel(s) === "critical")
-                .map((s) => s.groupeSanguin)
-                .join(", ")}
+              <bdi dir="ltr">
+                {below
+                  .filter((s) => stockLevel(s) === "critical")
+                  .map((s) => s.groupeSanguin)
+                  .join(", ")}
+              </bdi>
             </div>
           )}
 

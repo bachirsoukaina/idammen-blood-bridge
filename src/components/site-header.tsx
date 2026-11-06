@@ -26,7 +26,7 @@ export function SiteHeader() {
         <Link to="/" aria-label="Idammen">
           <Brand />
         </Link>
-        <nav aria-label="Principal" className="desktop-nav">
+        <nav aria-label={t("mainNav")} className="desktop-nav">
           <Link to="/" hash="how" className="nav-link" activeProps={{}}>
             {t("how")}
           </Link>

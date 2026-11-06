@@ -16,7 +16,7 @@ import { MapView } from "@/components/map/map-view";
 import { PageError, PageLoading } from "@/components/app-shell";
 import { ReserveDrop } from "@/components/reserves/reserve-drop";
 import { useReserves } from "@/hooks/use-reserves";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, ltr } from "@/lib/format";
 import { nationalReserves, worstLevel } from "@/lib/reserves";
 import { stockLevel } from "@/lib/stock";
 
@@ -80,7 +80,7 @@ function ReservesPage() {
                   <div>
                     <strong>
                       {t("tensionTitle", {
-                        groups: tension.map((r) => r.groupeSanguin).join(", "),
+                        groups: ltr(tension.map((r) => r.groupeSanguin).join(", ")),
                       })}
                     </strong>
                     <p>{t("tensionText")}</p>
